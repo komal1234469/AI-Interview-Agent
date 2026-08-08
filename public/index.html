@@ -1,0 +1,1259 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AI Interview Agent — The AI Cohort</title>
+<style>
+  :root {
+    --bg: #090D16;
+    --panel: #161F30;
+    --panel2: #1C273A;
+    --border: #2B3850;
+    --text: #FFFFFF;
+    --muted: #8b93a6;
+    --accent: #8B5CF6;
+    --accent2: #06B6D4;
+    --good: #4ade80;
+    --warn: #fbbf24;
+    --bad: #f87171;
+    --bot: #1a1e28;
+    --user: #23335a;
+    --input-bg: #0e1016;
+  }
+  html[data-theme="light"] {
+    --bg: #f4f9ff;
+    --panel: #ffffff;
+    --panel2: #eef7ff;
+    --border: #d6e6f5;
+    --text: #1f2940;
+    --muted: #6f7f96;
+    --accent: #6aaee8;
+    --accent2: #f28bb5;
+    --good: #35b97a;
+    --warn: #d99a32;
+    --bad: #e56b7d;
+    --bot: #edf6ff;
+    --user: #ffeaf3;
+    --input-bg: #f8fbff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: radial-gradient(1200px 600px at 50% -10%, #16192280, var(--bg));
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  header {
+    padding: 14px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+  header .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--good); box-shadow: 0 0 8px var(--good); }
+  header h1 { font-size: 15px; margin: 0; font-weight: 600; letter-spacing: .2px; flex-shrink:0; }
+  header span.sub { color: var(--muted); font-size: 12px; }
+  header .timer { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 13px; display:none; }
+  header .timer.active { display:block; }
+
+  #backBtn {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    background: var(--panel2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 12.5px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  #backBtn:hover { border-color: var(--accent); color: var(--accent); }
+  #backBtn.active { display: inline-flex; }
+
+  #headerRight { margin-left: auto; display: flex; align-items: center; gap: 14px; }
+
+  #themeToggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--panel2);
+    color: var(--text);
+    cursor: pointer;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+  #themeToggle:hover { border-color: var(--accent); }
+
+  #profileChip { display:none; align-items:center; gap:8px; cursor:pointer; position:relative; }
+  #profileChip.active { display:flex; }
+  #profileAvatar { width:28px; height:28px; border-radius:50%; background: linear-gradient(135deg, var(--accent), var(--accent2)); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#05070c; flex-shrink:0; }
+  #profileName { font-size: 13px; color: var(--text); }
+  #profileMenu { display:none; position:absolute; top: 38px; right: 0; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 10px; min-width: 180px; z-index: 20; box-shadow: 0 10px 30px rgba(0,0,0,.4); }
+  #profileMenu.open { display:block; }
+  #profileMenu .pmName { font-size: 13px; font-weight:600; margin-bottom:2px; }
+  #profileMenu .pmEmail { font-size: 12px; color: var(--muted); margin-bottom:10px; word-break: break-all; }
+  #profileMenu button { width:100%; padding:8px; border:1px solid var(--border); background: var(--panel2); color: var(--text); border-radius:7px; cursor:pointer; font-size:12.5px; }
+  #profileMenu button:hover { border-color: var(--bad); color: var(--bad); }
+
+  /* ---- auth screen ---- */
+  #authScreen { display:flex; flex:1; overflow:hidden; }
+  .authFormPanel { flex: 1 1 0; box-sizing: border-box; display:flex; flex-direction:column; justify-content:center; align-items:center; padding: 40px; overflow-y:auto; background: var(--bg); }
+  .authFormPanel .inner { width:100%; max-width: 380px; }
+  #authTagline { text-align:center; font-size: 14px; color: var(--muted); font-style: italic; margin: 0 0 20px; line-height: 1.5; }
+  #authScreen h2 { margin-top:0; font-size:16px; }
+  #authScreen p.subtext { color: var(--muted); font-size:12.5px; margin-top:-6px; }
+  #authScreen label { display:block; font-size:12px; color: var(--muted); margin: 14px 0 6px; }
+  #authScreen input { width:100%; padding:10px 12px; background:var(--input-bg); border:1px solid var(--border); border-radius:8px; color: var(--text); font-size:14px; }
+  #authScreen input:focus { outline: 1px solid var(--accent); border-color: var(--accent); }
+  #authScreen .primaryBtn { margin-top:18px; width:100%; padding:12px; border:none; border-radius:8px; background: var(--accent); color:#05070c; font-weight:600; cursor:pointer; font-size:14px; }
+  #authScreen .primaryBtn:hover { filter: brightness(1.08); }
+  #authScreen .switchLine { text-align:center; margin-top:14px; font-size:12.5px; color: var(--muted); }
+  #authScreen .switchLine a { color: var(--accent); text-decoration:none; cursor:pointer; }
+  #authScreen .authError { display:none; background: #2a1518; border:1px solid #5c2a2f; color: var(--bad); font-size:12.5px; padding:8px 10px; border-radius:7px; margin-top:12px; }
+  #authScreen .authError.show { display:block; }
+
+  .authHeroPanel {
+    flex: 1 1 0;
+    box-sizing: border-box;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px;
+    overflow: hidden;
+    box-shadow: inset 1px 0 0 var(--border);
+    background:
+      radial-gradient(circle at 50% 35%, color-mix(in srgb, var(--accent) 14%, transparent), transparent 62%),
+      radial-gradient(circle at 65% 72%, color-mix(in srgb, var(--accent2) 11%, transparent), transparent 58%),
+      var(--bg);
+  }
+    .orbGlow {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle at 35% 30%,
+      #C4B5FD 0%,
+      #8B5CF6 32%,
+      #06B6D4 68%,
+      #161F30 88%,
+      transparent 100%
+    );
+    box-shadow:
+      0 0 32px 8px rgba(139, 92, 246, 0.18),
+      0 0 65px 16px rgba(6, 182, 212, 0.12);
+    margin-bottom: 24px;
+    animation: floatOrb 6s ease-in-out infinite;
+  }
+  @keyframes floatOrb { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
+  .heroTitle { font-size: 21px; font-weight: 700; margin: 0 0 8px; }
+  .heroSub { font-size: 13px; color: var(--muted); max-width: 320px; margin: 0 0 26px; line-height: 1.65; }
+  .heroFeatures { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; max-width: 360px; }
+  .heroChip { background: var(--panel2); border:1px solid var(--border); padding:8px 14px; border-radius:999px; font-size:12px; color: var(--text); }
+
+  @media (max-width: 760px) {
+    .authHeroPanel { display: none; }
+    .authFormPanel { flex: 1 1 100%; }
+  }
+
+  /* ---- progress bar ---- */
+  #progressWrap { display: none; padding: 10px 24px 12px; border-bottom: 1px solid var(--border); flex-shrink:0; }
+  #progressWrap.active { display: block; }
+  .progress-top { display:flex; justify-content:space-between; align-items:center; font-size:12px; color:var(--muted); margin-bottom:8px; }
+  .progress-track { height: 6px; background: #1a1e28; border-radius: 999px; overflow:hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius:999px; transition: width .4s ease; }
+  #topicChip { display:inline-flex; align-items:center; gap:6px; margin-top:8px; padding:4px 10px; background: var(--panel2); border:1px solid var(--border); border-radius: 999px; font-size:12px; color: var(--text); }
+  #topicChip .pulse { width:6px; height:6px; border-radius:50%; background: var(--accent); animation: pulse 1.4s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+  /* ---- setup screen ---- */
+  #setup { max-width: 620px; margin: 40px auto; padding: 0 20px; flex: 1; overflow-y:auto; }
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 22px; margin-bottom:16px; }
+  #setup label { display: block; font-size: 12px; color: var(--muted); margin: 14px 0 6px; }
+  #setup select { width: 100%; padding: 10px 12px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 14px; }
+  #setup button { margin-top: 18px; width: 100%; padding: 12px; border: none; border-radius: 8px; background: var(--accent); color: #05070c; font-weight: 600; cursor: pointer; font-size: 14px; }
+  #setup button:hover { filter: brightness(1.08); }
+  #setup button:disabled { opacity: .5; cursor: not-allowed; filter: none; }
+  #noMissionsNote { display:none; margin-top:10px; font-size:12px; color: var(--warn); background: #241d0f; border:1px solid #4a3a12; border-radius:7px; padding:8px 10px; }
+  #noMissionsNote.show { display:block; }
+
+  /* ---- assessment quiz screen ---- */
+  #assessmentScreen { display:none; max-width: 620px; margin: 40px auto; padding: 0 20px; flex: 1; overflow-y:auto; }
+  #assessmentScreen .card { }
+  #quizProgressTop { display:flex; justify-content:space-between; align-items:center; font-size:12px; color:var(--muted); margin-bottom:10px; }
+  #quizProgressTrack { height:6px; background:#1a1e28; border-radius:999px; overflow:hidden; margin-bottom:20px; }
+  #quizProgressFill { height:100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius:999px; transition: width .3s ease; }
+  #quizQuestion { font-size:16px; font-weight:600; margin-bottom:4px; }
+  #quizSubtext { font-size:12.5px; color:var(--muted); margin-bottom:18px; }
+  #quizOptions { display:flex; flex-direction:column; gap:10px; }
+  .quizOptBtn { text-align:left; padding:13px 16px; background:var(--input-bg); border:1px solid var(--border); border-radius:10px; color:var(--text); font-size:14px; cursor:pointer; transition: border-color .15s ease, background .15s ease; }
+  .quizOptBtn:hover { border-color: var(--accent); background:#12151d; }
+  #quizDoneNote { display:none; text-align:center; padding:20px; color: var(--good); font-size:14px; }
+  #candidateStats { display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; margin-top:14px; }
+  .stat { background:var(--input-bg); border:1px solid var(--border); border-radius:10px; padding:10px 12px; }
+  .stat .val { font-size: 18px; font-weight:700; }
+  .stat .lbl { font-size: 11px; color: var(--muted); margin-top:2px; }
+
+  main { flex: 1; overflow-y: auto; padding: 24px; display: none; }
+  main.active { display: block; }
+  .msgs { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
+  .msg { padding: 12px 16px; border-radius: 12px; line-height: 1.5; font-size: 14.5px; white-space: pre-wrap; max-width: 85%; }
+  .msg.bot { background: var(--bot); border: 1px solid var(--border); align-self: flex-start; border-bottom-left-radius: 4px; }
+  .msg.user { background: var(--user); align-self: flex-end; border-bottom-right-radius: 4px; }
+  .msg.system { align-self: center; color: var(--muted); font-size: 12px; background: none; }
+  .typingDots { display:inline-flex; gap:4px; align-items:center; }
+  .typingDots span { width:5px; height:5px; border-radius:50%; background:var(--muted); animation: bounce 1.2s infinite; }
+  .typingDots span:nth-child(2) { animation-delay: .15s; }
+  .typingDots span:nth-child(3) { animation-delay: .3s; }
+  @keyframes bounce { 0%,60%,100%{transform:translateY(0); opacity:.5} 30%{transform:translateY(-4px); opacity:1} }
+
+  /* ---- feedback / report screen ---- */
+  #feedbackWrap { display:none; flex:1; overflow-y:auto; padding: 24px; }
+  #feedback { max-width: 720px; margin: 0 auto; }
+  .readiness-hero { text-align:center; padding: 24px; margin-bottom: 18px; }
+  .readiness-hero .ring { width:110px; height:110px; border-radius:50%; margin: 0 auto 12px; display:flex; align-items:center; justify-content:center; font-size:26px; font-weight:800; }
+  .readiness-hero .label { font-size: 14px; color: var(--muted); }
+  #feedback h2 { margin-top: 0; font-size: 16px; }
+  #feedback h3 { font-size: 12px; color: var(--accent); text-transform: uppercase; letter-spacing: .6px; margin: 18px 0 10px; }
+  #feedback ul { margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.7; }
+  .score-row { display:flex; align-items:center; gap:10px; margin-bottom:8px; font-size:13px; }
+  .score-row .name { flex: 1; color: var(--text); }
+  .score-bar-track { width:120px; height:8px; background:var(--input-bg); border-radius:999px; overflow:hidden; }
+  .score-bar-fill { height:100%; border-radius:999px; }
+  .score-num { width:28px; text-align:right; color: var(--muted); font-variant-numeric: tabular-nums; }
+  #downloadBtn { margin-top: 20px; width:100%; padding:11px; border:1px solid var(--border); background: var(--panel2); color:var(--text); border-radius:8px; cursor:pointer; font-size:13px; }
+  #downloadBtn:hover { border-color: var(--accent); }
+
+  footer { border-top: 1px solid var(--border); padding: 16px 24px; display: none; flex-shrink:0; }
+  footer.active { display: block; }
+  #chatForm { max-width: 720px; margin: 0 auto; display: flex; gap: 10px; }
+  #chatForm textarea { flex: 1; resize: none; background: var(--input-bg); border: 1px solid var(--border); border-radius: 10px; color: var(--text); padding: 10px 12px; font-size: 14px; font-family: inherit; min-height: 44px; }
+  #chatForm button { padding: 0 20px; border:none; border-radius:8px; background: var(--accent); color:#05070c; font-weight:600; cursor:pointer; font-size:14px; }
+  #chatForm button:disabled { opacity:.5; cursor:not-allowed; }
+
+  #creditFooter {
+    flex-shrink: 0;
+    text-align: center;
+    padding: 8px 10px;
+    font-size: 11.5px;
+    color: var(--muted);
+    border-top: 1px solid var(--border);
+    letter-spacing: .2px;
+  }
+  #creditFooter strong { color: var(--text); font-weight: 600; }
+
+  /* Intelligent Tech — dark mode first */
+  :root {
+    --accent: #8B5CF6;
+    --accent2: #06B6D4;
+    --bg: #090D16;
+    --text: #FFFFFF;
+    --panel: #161F30;
+    --panel2: #1C273A;
+    --border: #2B3850;
+  }
+
+  body {
+    background:
+      radial-gradient(circle at 10% 14%, rgba(139, 92, 246, 0.10), transparent 30%),
+      radial-gradient(circle at 90% 82%, rgba(6, 182, 212, 0.08), transparent 32%),
+      #090D16;
+    color: #FFFFFF;
+  }
+
+  /* AI gradient used for active/primary actions */
+  button, .primary, .btn, .cta {
+    background: linear-gradient(135deg, #8B5CF6, #06B6D4) !important;
+    border-color: #8B5CF6 !important;
+    color: #FFFFFF !important;
+    box-shadow: 0 8px 24px rgba(139, 92, 246, 0.18);
+  }
+
+  a, .link, .accent {
+    color: #06B6D4 !important;
+  }
+
+  input, textarea, select {
+    background: #0F1522;
+    color: #FFFFFF;
+    border-color: #2B3850;
+  }
+
+  input::placeholder, textarea::placeholder {
+    color: #7E8BA3;
+  }
+
+  input:focus, textarea:focus, select:focus {
+    border-color: #8B5CF6 !important;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.12) !important;
+  }
+
+  .card, .panel, .loginCard, .authCard {
+    background: #161F30;
+    color: #FFFFFF;
+    border-color: #2B3850;
+  }
+
+  /* Emerald reserved for live/camera state */
+  .live, .camera-active, .recording, [data-status="live"] {
+    color: #10B981 !important;
+    border-color: #10B981 !important;
+  }
+
+  /* Soft light-blue + pink theme overrides — dark mode remains unchanged */
+  html[data-theme="light"] body {
+    background:
+      radial-gradient(circle at 10% 14%, rgba(106, 174, 232, 0.16), transparent 38%),
+      radial-gradient(circle at 90% 82%, rgba(242, 139, 181, 0.14), transparent 38%),
+      #f4f9ff;
+    color: #1f2940;
+  }
+
+  html[data-theme="light"] button,
+  html[data-theme="light"] .primary,
+  html[data-theme="light"] .btn,
+  html[data-theme="light"] .cta {
+    background: linear-gradient(135deg, #72b8ee, #f18ab5) !important;
+    border-color: #72b8ee !important;
+    color: #ffffff !important;
+    box-shadow: 0 8px 24px rgba(106, 174, 232, 0.20);
+  }
+
+  html[data-theme="light"] a,
+  html[data-theme="light"] .link,
+  html[data-theme="light"] .accent {
+    color: #e56f9e !important;
+  }
+
+  html[data-theme="light"] input,
+  html[data-theme="light"] textarea,
+  html[data-theme="light"] select {
+    background: #f8fbff;
+    color: #1f2940;
+    border-color: #d6e6f5;
+  }
+
+  html[data-theme="light"] input::placeholder,
+  html[data-theme="light"] textarea::placeholder {
+    color: #8b9bb0;
+  }
+
+  html[data-theme="light"] input:focus,
+  html[data-theme="light"] textarea:focus,
+  html[data-theme="light"] select:focus {
+    border-color: #72b8ee !important;
+    box-shadow: 0 0 0 3px rgba(106, 174, 232, 0.14) !important;
+  }
+
+  html[data-theme="light"] .card,
+  html[data-theme="light"] .panel,
+  html[data-theme="light"] .loginCard,
+  html[data-theme="light"] .authCard {
+    background: #ffffff;
+    color: #1f2940;
+    border-color: #d6e6f5;
+  }
+
+  html[data-theme="light"] .authHeroPanel {
+    background:
+      radial-gradient(circle at 35% 30%, rgba(106, 174, 232, 0.18), transparent 42%),
+      radial-gradient(circle at 72% 70%, rgba(242, 139, 181, 0.18), transparent 42%),
+      #f4f9ff;
+  }
+
+  html[data-theme="light"] .orbGlow {
+    background: radial-gradient(
+      circle at 35% 30%,
+      #d8efff 0%,
+      #72b8ee 35%,
+      #f18ab5 70%,
+      #ffffff 90%,
+      transparent 100%
+    );
+    box-shadow:
+      0 0 32px 8px rgba(106, 174, 232, 0.20),
+      0 0 65px 16px rgba(242, 139, 181, 0.14);
+  }
+
+  html[data-theme="light"] .heroChip,
+  html[data-theme="light"] #backBtn,
+  html[data-theme="light"] #themeToggle,
+  html[data-theme="light"] #profileMenu button,
+  html[data-theme="light"] #topicChip {
+    background: #eef7ff;
+    border-color: #d6e6f5;
+    color: #1f2940;
+  }
+
+  html[data-theme="light"] .msg.bot {
+    background: #edf6ff;
+    border-color: #d6e6f5;
+  }
+
+  html[data-theme="light"] .msg.user {
+    background: #ffeaf3;
+  }
+
+  html[data-theme="light"] .quizOptBtn {
+    background: #f8fbff;
+    border-color: #d6e6f5;
+    color: #1f2940;
+  }
+
+  html[data-theme="light"] .quizOptBtn:hover {
+    border-color: #72b8ee;
+    background: #eef7ff;
+  }
+
+  html[data-theme="light"] .progress-track,
+  html[data-theme="light"] #quizProgressTrack {
+    background: #e2edf7;
+  }
+
+  html[data-theme="light"] .score-bar-track {
+    background: #e6eef7;
+  }
+
+
+</style>
+</head>
+<body>
+  <header>
+    <button id="backBtn" type="button">&larr; Back</button>
+    <div class="dot"></div>
+    <h1>AI Interview Agent <span class="sub">&nbsp;·&nbsp; The AI Cohort</span></h1>
+    <div id="headerRight">
+      <button id="themeToggle" type="button" title="Toggle light/dark theme">🌙</button>
+      <div class="timer" id="timer">00:00</div>
+      <div id="profileChip">
+        <div id="profileAvatar">?</div>
+        <span id="profileName"></span>
+        <div id="profileMenu">
+          <div class="pmName" id="pmName"></div>
+          <div class="pmEmail" id="pmEmail"></div>
+          <button id="editProfileBtn" type="button" style="margin-bottom:8px;">Edit Profile</button>
+          <button id="viewHistoryBtn" type="button" style="margin-bottom:8px;">Report History</button>
+          <button id="logoutBtn" type="button">Log out</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div id="progressWrap">
+    <div class="progress-top">
+      <span id="progressLabel">Question 0</span>
+      <span id="progressCount"></span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    <div id="topicChip" style="display:none"><span class="pulse"></span><span id="topicChipText"></span></div>
+  </div>
+
+  <div id="authScreen">
+    <div class="authFormPanel">
+      <div class="inner">
+        <p id="authTagline">"Don't just finish the cohort — be ready to defend it."</p>
+        <div class="card">
+          <h2 id="authTitle">Log in</h2>
+          <p class="subtext" id="authSubtext">Log in to start your mock interview.</p>
+
+          <div id="signupNameWrap" style="display:none;">
+            <label for="authName">Name</label>
+            <input id="authName" type="text" placeholder="Jane Doe" autocomplete="name" />
+          </div>
+
+          <label for="authEmail">Email</label>
+          <input id="authEmail" type="email" placeholder="you@example.com" autocomplete="email" />
+
+          <label for="authPassword">Password</label>
+          <input id="authPassword" type="password" placeholder="••••••••" autocomplete="current-password" />
+
+          <button class="primaryBtn" id="authSubmitBtn">Log in</button>
+          <div class="authError" id="authError"></div>
+
+          <div class="switchLine">
+            <span id="switchText">Don't have an account?</span>
+            <a id="switchLink">Sign up</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="authHeroPanel">
+      <div class="orbGlow"></div>
+      <div class="heroTitle">AI Interview Agent</div>
+      <p class="heroSub">A live, adaptive mock interview built from your real cohort progress — not generic trivia.</p>
+      <div class="heroFeatures">
+        <span class="heroChip">Personalized questions</span>
+        <span class="heroChip">Adaptive follow-ups</span>
+        <span class="heroChip">Instant readiness score</span>
+        <span class="heroChip">Bonus challenge round</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="setup" style="display:none;">
+    <div class="card">
+      <h2 style="margin-top:0;font-size:16px;">Start a mock interview</h2>
+      <p style="color:var(--muted);font-size:13px;">Pick a candidate profile from the cohort. The agent builds a personalized interview plan from their real mission history, adapts follow-ups to their answers, and can escalate into a bonus challenge round if they're doing well.</p>
+      <label for="candidateSelect">Candidate</label>
+      <select id="candidateSelect"></select>
+      <div id="candidateStats"></div>
+      <button id="startBtn">Start Interview</button>
+      <div id="noMissionsNote">This profile has no mission history yet, so there's nothing to build a personalized interview from. Pick a cohort candidate above, or complete some missions first.</div>
+      <button id="askAiBtn" type="button" style="margin-top:10px; background:var(--panel2)!important; color:var(--text)!important;">Ask AI a Question</button>
+    </div>
+  </div>
+
+  <div id="historyScreen" style="display:none; max-width:620px; margin:40px auto; padding:0 20px; flex:1; overflow-y:auto;">
+    <div class="card">
+      <h2 style="margin-top:0;font-size:16px;">Report History</h2>
+      <p style="color:var(--muted);font-size:13px;">Your past interview reports, most recent first.</p>
+      <div id="historyList"></div>
+    </div>
+  </div>
+
+  <div id="askAiScreen" style="display:none; max-width:620px; margin:40px auto; padding:0 20px; flex:1; overflow-y:auto;">
+    <div class="card">
+      <h2 style="margin-top:0;font-size:16px;">Ask AI</h2>
+      <p style="color:var(--muted);font-size:13px;">Ask anything — not limited to the interview.</p>
+      <textarea id="askAiInput" rows="3" style="width:100%; background:var(--input-bg); border:1px solid var(--border); border-radius:8px; color:var(--text); padding:10px; font-family:inherit; font-size:14px;" placeholder="Type your question..."></textarea>
+      <button id="askAiSubmitBtn" style="margin-top:10px;">Ask</button>
+      <div id="askAiAnswer" style="margin-top:16px; font-size:14px; line-height:1.6; white-space:pre-wrap;"></div>
+    </div>
+  </div>
+
+  <div id="editProfileModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:30; align-items:center; justify-content:center;">
+    <div class="card" style="width:100%; max-width:360px;">
+      <h2 style="margin-top:0;font-size:16px;">Edit Profile</h2>
+      <label style="display:block; font-size:12px; color:var(--muted); margin:14px 0 6px;">Name</label>
+      <input id="editName" type="text" style="width:100%; padding:10px 12px; background:var(--input-bg); border:1px solid var(--border); border-radius:8px; color:var(--text); font-size:14px;" />
+      <label style="display:block; font-size:12px; color:var(--muted); margin:14px 0 6px;">Job Role</label>
+      <input id="editJobRole" type="text" style="width:100%; padding:10px 12px; background:var(--input-bg); border:1px solid var(--border); border-radius:8px; color:var(--text); font-size:14px;" />
+      <label style="display:block; font-size:12px; color:var(--muted); margin:14px 0 6px;">Years of Experience</label>
+      <input id="editYears" type="number" min="0" style="width:100%; padding:10px 12px; background:var(--input-bg); border:1px solid var(--border); border-radius:8px; color:var(--text); font-size:14px;" />
+      <button id="saveProfileBtn" style="margin-top:16px; width:100%; padding:11px; border:none; border-radius:8px; font-weight:600; cursor:pointer; font-size:14px;">Save</button>
+      <button id="cancelProfileBtn" style="margin-top:8px; width:100%; padding:11px; border:1px solid var(--border); border-radius:8px; background:var(--panel2)!important; color:var(--text)!important; cursor:pointer; font-size:14px;">Cancel</button>
+    </div>
+  </div>
+
+  <div id="assessmentScreen">
+    <div class="card">
+      <div id="quizProgressTop"><span id="quizProgressLabel">Question 1</span><span id="quizProgressCount"></span></div>
+      <div id="quizProgressTrack"><div id="quizProgressFill" style="width:0%"></div></div>
+      <div id="quizQuestion"></div>
+      <div id="quizSubtext"></div>
+      <div id="quizOptions"></div>
+      <div id="quizDoneNote">Nice — your profile is set up. Head back and hit Start Interview.</div>
+    </div>
+  </div>
+
+  <main id="chat"><div class="msgs" id="msgs"></div></main>
+
+  <div id="feedbackWrap"><div id="feedback"></div></div>
+
+  <footer id="footer">
+    <form id="chatForm">
+      <textarea id="messageInput" placeholder="Type your answer..." rows="1"></textarea>
+      <button type="submit" id="sendBtn">Send</button>
+    </form>
+  </footer>
+  <div id="creditFooter">&copy; <span id="creditYear"></span> <strong>AI Interview Agent</strong> · The AI Cohort — Developed by <strong>Root Access Team</strong></div>
+  <script>
+const sessionId = 'demo-' + Math.random().toString(36).slice(2, 10);
+let candidates = [];
+let currentCandidate = null;
+let startTime = null;
+let timerHandle = null;
+
+document.getElementById('creditYear').textContent = new Date().getFullYear();
+
+/* =======================================================================
+   Light / dark theme toggle — preference is remembered per browser.
+======================================================================= */
+const THEME_KEY = 'aiInterviewTheme';
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  document.getElementById('themeToggle').textContent = theme === 'light' ? '☀️' : '🌙';
+  localStorage.setItem(THEME_KEY, theme);
+}
+
+(function initTheme() {
+  const saved = localStorage.getItem(THEME_KEY);
+  const preferred = saved || (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+  applyTheme(preferred);
+})();
+
+document.getElementById('themeToggle').addEventListener('click', () => {
+  const current = document.documentElement.getAttribute('data-theme');
+  applyTheme(current === 'light' ? 'dark' : 'light');
+});
+
+/* =======================================================================
+   Auth (front-end demo only) — accounts are stored in this browser's
+   localStorage. There is no server-side user database or password
+   security here; this is a lightweight login/profile flow for the demo,
+   not production authentication.
+======================================================================= */
+const USERS_KEY = 'aiInterviewUsers';
+const SESSION_KEY = 'aiInterviewCurrentUser';
+let authMode = 'login'; // 'login' | 'signup'
+
+function getUsers() {
+  try { return JSON.parse(localStorage.getItem(USERS_KEY) || '{}'); } catch { return {}; }
+}
+function saveUsers(users) { localStorage.setItem(USERS_KEY, JSON.stringify(users)); }
+function getCurrentUser() {
+  try { return JSON.parse(localStorage.getItem(SESSION_KEY) || 'null'); } catch { return null; }
+}
+function setCurrentUser(user) { localStorage.setItem(SESSION_KEY, JSON.stringify(user)); }
+function clearCurrentUser() { localStorage.removeItem(SESSION_KEY); }
+
+function showAuthError(msg) {
+  const el = document.getElementById('authError');
+  el.textContent = msg;
+  el.classList.add('show');
+}
+function hideAuthError() {
+  document.getElementById('authError').classList.remove('show');
+}
+
+function setAuthMode(mode) {
+  authMode = mode;
+  hideAuthError();
+  const isSignup = mode === 'signup';
+  document.getElementById('authTitle').textContent = isSignup ? 'Sign up' : 'Log in';
+  document.getElementById('authSubtext').textContent = isSignup
+    ? 'Create an account to start your mock interview.'
+    : 'Log in to start your mock interview.';
+  document.getElementById('signupNameWrap').style.display = isSignup ? 'block' : 'none';
+  document.getElementById('authSubmitBtn').textContent = isSignup ? 'Sign up' : 'Log in';
+  document.getElementById('switchText').textContent = isSignup ? 'Already have an account?' : "Don't have an account?";
+  document.getElementById('switchLink').textContent = isSignup ? 'Log in' : 'Sign up';
+}
+
+document.getElementById('switchLink').addEventListener('click', () => {
+  setAuthMode(authMode === 'login' ? 'signup' : 'login');
+});
+
+document.getElementById('authSubmitBtn').addEventListener('click', () => {
+  hideAuthError();
+  const email = document.getElementById('authEmail').value.trim().toLowerCase();
+  const password = document.getElementById('authPassword').value;
+  const name = document.getElementById('authName').value.trim();
+
+  if (!email || !password) { showAuthError('Please fill in email and password.'); return; }
+
+  const users = getUsers();
+
+  if (authMode === 'signup') {
+    if (!name) { showAuthError('Please enter your name.'); return; }
+    if (users[email]) { showAuthError('An account with this email already exists. Log in instead.'); return; }
+    users[email] = { name, email, password };
+    saveUsers(users);
+    setCurrentUser({ name, email });
+    enterApp();
+  } else {
+    const u = users[email];
+    if (!u || u.password !== password) { showAuthError('Incorrect email or password.'); return; }
+    setCurrentUser({ name: u.name, email: u.email });
+    enterApp();
+  }
+});
+
+function enterApp() {
+  const user = getCurrentUser();
+  if (!user) return;
+  document.getElementById('authScreen').style.display = 'none';
+  document.getElementById('setup').style.display = 'block';
+
+  const chip = document.getElementById('profileChip');
+  chip.classList.add('active');
+  document.getElementById('profileAvatar').textContent = (user.name || '?').trim().charAt(0).toUpperCase();
+  document.getElementById('profileName').textContent = user.name;
+  document.getElementById('pmName').textContent = user.name;
+  document.getElementById('pmEmail').textContent = user.email;
+
+  loadCandidates();
+}
+
+document.getElementById('profileChip').addEventListener('click', (e) => {
+  document.getElementById('profileMenu').classList.toggle('open');
+  e.stopPropagation();
+});
+document.addEventListener('click', () => document.getElementById('profileMenu').classList.remove('open'));
+
+document.getElementById('logoutBtn').addEventListener('click', () => {
+  clearCurrentUser();
+  location.reload();
+});
+
+/* ---- Back button: returns to the setup (candidate select) screen ---- */
+function goBackToSetup() {
+  stopTimer();
+  document.getElementById('timer').classList.remove('active');
+  document.getElementById('timer').textContent = '00:00';
+  document.getElementById('chat').classList.remove('active');
+  document.getElementById('footer').classList.remove('active');
+  document.getElementById('feedbackWrap').style.display = 'none';
+  document.getElementById('assessmentScreen').style.display = 'none';
+  document.getElementById('historyScreen').style.display = 'none';
+  document.getElementById('askAiScreen').style.display = 'none';
+  document.getElementById('progressWrap').classList.remove('active');
+  document.getElementById('msgs').innerHTML = '';
+  document.getElementById('backBtn').classList.remove('active');
+  document.getElementById('setup').style.display = 'block';
+}
+document.getElementById('backBtn').addEventListener('click', goBackToSetup);
+
+(function initAuth() {
+  const user = getCurrentUser();
+  if (user) enterApp();
+})();
+
+/* =======================================================================
+   Each signed-up user gets their own "candidate" profile, stored per
+   email in localStorage, starting at 0 missions/days/first-try passes.
+   This is shown (and selected by default) alongside the demo cohort
+   candidates fetched from the server.
+======================================================================= */
+const USER_CANDIDATE_PREFIX = 'aiInterviewOwnCandidate:';
+
+function getOrCreateOwnCandidate(user) {
+  const key = USER_CANDIDATE_PREFIX + user.email;
+  const existing = localStorage.getItem(key);
+  if (existing) {
+    try { return JSON.parse(existing); } catch { /* fall through to recreate */ }
+  }
+  const fresh = {
+    isOwnProfile: true,
+    member: { name: user.name, jobRole: 'Cohort Member', yearsExperience: 0 },
+    signals: { missionsCompleted: 0, commitDays: 0, missionsFirstTry: 0 },
+    missions: [],
+  };
+  localStorage.setItem(key, JSON.stringify(fresh));
+  return fresh;
+}
+
+async function loadCandidates() {
+  const user = getCurrentUser();
+  const res = await fetch('/api/candidates');
+  const demoCandidates = await res.json();
+
+  const ownCandidate = user ? getOrCreateOwnCandidate(user) : null;
+  candidates = ownCandidate ? [ownCandidate, ...demoCandidates] : demoCandidates;
+
+  const sel = document.getElementById('candidateSelect');
+  sel.innerHTML = candidates.map((c, i) => {
+    const label = c.isOwnProfile ? `${c.member.name} (You)` : `${c.member.name} — ${c.member.jobRole}`;
+    return `<option value="${i}">${label}</option>`;
+  }).join('');
+  sel.value = 0; // default to the logged-in user's own (fresh) profile
+  renderCandidateStats(candidates[0]);
+  sel.addEventListener('change', () => renderCandidateStats(candidates[sel.value]));
+}
+
+function renderCandidateStats(c) {
+  const s = c.signals || {};
+  document.getElementById('candidateStats').innerHTML = `
+    <div class="stat"><div class="val">${s.missionsCompleted ?? '—'}</div><div class="lbl">Missions completed</div></div>
+    <div class="stat"><div class="val">${s.commitDays ?? '—'}</div><div class="lbl">Active days</div></div>
+    <div class="stat"><div class="val">${s.missionsFirstTry ?? '—'}</div><div class="lbl">First-try passes</div></div>
+  `;
+  const hasNoMissions = !c.missions || c.missions.length === 0;
+  const startBtn = document.getElementById('startBtn');
+  const note = document.getElementById('noMissionsNote');
+
+  if (hasNoMissions && c.isOwnProfile) {
+    startBtn.disabled = false;
+    startBtn.textContent = 'Take Quick Assessment (5 min)';
+    note.classList.remove('show');
+  } else if (hasNoMissions) {
+    startBtn.disabled = true;
+    startBtn.textContent = 'Start Interview';
+    note.classList.add('show');
+  } else {
+    startBtn.disabled = false;
+    startBtn.textContent = 'Start Interview';
+    note.classList.remove('show');
+  }
+}
+
+function addMsg(text, cls) {
+  const msgs = document.getElementById('msgs');
+  const el = document.createElement('div');
+  el.className = 'msg ' + cls;
+  el.textContent = text;
+  msgs.appendChild(el);
+  document.getElementById('chat').scrollTop = 1e9;
+  return el;
+}
+
+function addTyping() {
+  const msgs = document.getElementById('msgs');
+  const el = document.createElement('div');
+  el.className = 'msg bot';
+  el.innerHTML = '<span class="typingDots"><span></span><span></span><span></span></span>';
+  msgs.appendChild(el);
+  document.getElementById('chat').scrollTop = 1e9;
+  return el;
+}
+
+function startTimer() {
+  startTime = Date.now();
+  document.getElementById('timer').classList.add('active');
+  timerHandle = setInterval(() => {
+    const s = Math.floor((Date.now() - startTime) / 1000);
+    const mm = String(Math.floor(s / 60)).padStart(2, '0');
+    const ss = String(s % 60).padStart(2, '0');
+    document.getElementById('timer').textContent = `${mm}:${ss}`;
+  }, 1000);
+}
+function stopTimer() { clearInterval(timerHandle); }
+
+function updateProgress(progress) {
+  if (!progress) return;
+  document.getElementById('progressWrap').classList.add('active');
+  document.getElementById('progressLabel').textContent = `Question ${progress.questionsAsked}`;
+  document.getElementById('progressCount').textContent = `${progress.topicsCompleted}/${progress.totalTopics} topics`;
+  const pct = Math.min(100, Math.round((progress.topicsCompleted / Math.max(progress.totalTopics, 1)) * 100));
+  document.getElementById('progressFill').style.width = pct + '%';
+  if (progress.currentTopic) {
+    const chip = document.getElementById('topicChip');
+    chip.style.display = 'inline-flex';
+    document.getElementById('topicChipText').textContent = `Day ${progress.currentTopic.day || '—'} · ${progress.currentTopic.title}`;
+  }
+}
+
+/* =======================================================================
+   Quick Assessment — a ~10-question MCQ quiz for a brand-new profile
+   with no mission history. The answers are converted into a real
+   missions[] array (day, passed, attempts, skipped) that matches the
+   exact shape the backend's interviewPlanner expects, using the real
+   curriculum day numbers/titles so the generated interview works
+   exactly like it does for the demo cohort candidates.
+======================================================================= */
+const REACH_OPTIONS = [
+  { label: 'Day 1–6 · Setup & Data Foundations', cutoff: 6 },
+  { label: 'Day 7–15 · Embeddings, LLM Core & Fine-Tuning', cutoff: 15 },
+  { label: 'Day 16–24 · Chatbot Build, Agents & MCP', cutoff: 24 },
+  { label: 'Day 25–31 · Evaluation, Deployment & Capstone', cutoff: 31 },
+];
+
+const QUIZ_DAYS = [
+  { day: 3, title: 'First AI Project, React Frontend & GitHub' },
+  { day: 6, title: 'Building the Knowledge Base' },
+  { day: 10, title: 'The Retrieval & Matching Engine' },
+  { day: 13, title: 'Advanced Prompting: Function Calling & Structured Outputs' },
+  { day: 15, title: 'Fine-Tuning: Hands-On with LoRA & QLoRA' },
+  { day: 20, title: 'Conversation Memory & Context Management' },
+  { day: 23, title: 'Model Context Protocol (MCP)' },
+  { day: 27, title: 'Security, Privacy & Guardrails' },
+  { day: 31, title: 'Capstone Project & Final Demo' },
+];
+
+const STATUS_OPTIONS = [
+  { label: 'Passed on the first try', passed: true, attempts: 1 },
+  { label: 'Passed after several attempts', passed: true, attempts: 4 },
+  { label: 'Struggled a lot, never fully clicked', passed: false, attempts: 3 },
+  { label: 'Skipped this one', skipped: true },
+];
+
+let quizCutoff = null;
+let quizQueue = [];
+let quizIndex = -1; // -1 = still on the "how far did you get" question
+let quizAnswers = {}; // { day: {passed, attempts, skipped} }
+
+function startAssessment() {
+  quizCutoff = null;
+  quizQueue = [];
+  quizIndex = -1;
+  quizAnswers = {};
+  document.getElementById('setup').style.display = 'none';
+  document.getElementById('assessmentScreen').style.display = 'block';
+  document.getElementById('backBtn').classList.add('active');
+  document.getElementById('quizDoneNote').style.display = 'none';
+  document.getElementById('quizQuestion').style.display = 'block';
+  document.getElementById('quizOptions').style.display = 'flex';
+  renderReachQuestion();
+}
+
+function updateQuizProgress(current, total) {
+  document.getElementById('quizProgressLabel').textContent = `Question ${current}`;
+  document.getElementById('quizProgressCount').textContent = `of ${total}`;
+  document.getElementById('quizProgressFill').style.width = Math.round((current / total) * 100) + '%';
+}
+
+function renderReachQuestion() {
+  updateQuizProgress(1, QUIZ_DAYS.length + 1);
+  document.getElementById('quizQuestion').textContent = 'How far have you gotten in the cohort?';
+  document.getElementById('quizSubtext').textContent = 'Pick the module/day range you\'ve covered so far.';
+  const opts = document.getElementById('quizOptions');
+  opts.innerHTML = '';
+  REACH_OPTIONS.forEach((opt) => {
+    const btn = document.createElement('button');
+    btn.className = 'quizOptBtn';
+    btn.textContent = opt.label;
+    btn.addEventListener('click', () => {
+      quizCutoff = opt.cutoff;
+      quizQueue = QUIZ_DAYS.filter((d) => d.day <= quizCutoff);
+      quizIndex = 0;
+      if (quizQueue.length === 0) { finishAssessment(); return; }
+      renderDayQuestion();
+    });
+    opts.appendChild(btn);
+  });
+}
+
+function renderDayQuestion() {
+  const d = quizQueue[quizIndex];
+  updateQuizProgress(quizIndex + 2, QUIZ_DAYS.length + 1);
+  document.getElementById('quizQuestion').textContent = `Day ${d.day}: ${d.title}`;
+  document.getElementById('quizSubtext').textContent = 'How did this topic/mission go for you?';
+  const opts = document.getElementById('quizOptions');
+  opts.innerHTML = '';
+  STATUS_OPTIONS.forEach((opt) => {
+    const btn = document.createElement('button');
+    btn.className = 'quizOptBtn';
+    btn.textContent = opt.label;
+    btn.addEventListener('click', () => {
+      quizAnswers[d.day] = { passed: opt.passed ?? false, attempts: opt.attempts, skipped: !!opt.skipped };
+      quizIndex += 1;
+      if (quizIndex < quizQueue.length) {
+        renderDayQuestion();
+      } else {
+        finishAssessment();
+      }
+    });
+    opts.appendChild(btn);
+  });
+}
+
+function finishAssessment() {
+  // Build the full 31-day missions array: answered days use the real
+  // answer, unanswered days at/before the reach cutoff default to a
+  // clean pass, days beyond the cutoff are treated as skipped.
+  const missions = [];
+  for (let day = 1; day <= 31; day++) {
+    if (quizAnswers[day]) {
+      missions.push({ day, ...quizAnswers[day] });
+    } else if (day <= quizCutoff) {
+      missions.push({ day, passed: true, attempts: 1, skipped: false });
+    } else {
+      missions.push({ day, passed: false, attempts: 0, skipped: true });
+    }
+  }
+
+  const missionsCompleted = missions.filter((m) => m.passed).length;
+  const commitDays = missions.filter((m) => !m.skipped).length;
+  const missionsFirstTry = missions.filter((m) => m.passed && (m.attempts || 1) === 1).length;
+
+  const user = getCurrentUser();
+  const key = USER_CANDIDATE_PREFIX + user.email;
+  const updated = {
+    isOwnProfile: true,
+    member: { name: user.name, jobRole: 'Cohort Member', yearsExperience: 0 },
+    signals: { missionsCompleted, commitDays, missionsFirstTry },
+    missions,
+  };
+  localStorage.setItem(key, JSON.stringify(updated));
+  candidates[0] = updated;
+
+  document.getElementById('quizQuestion').style.display = 'none';
+  document.getElementById('quizSubtext').textContent = '';
+  document.getElementById('quizOptions').style.display = 'none';
+  document.getElementById('quizDoneNote').style.display = 'block';
+
+  setTimeout(() => {
+    document.getElementById('assessmentScreen').style.display = 'none';
+    document.getElementById('backBtn').classList.remove('active');
+    document.getElementById('setup').style.display = 'block';
+    document.getElementById('candidateSelect').value = 0;
+    renderCandidateStats(candidates[0]);
+  }, 1400);
+}
+
+async function beginInterview() {
+  document.getElementById('setup').style.display = 'none';
+  document.getElementById('chat').classList.add('active');
+  document.getElementById('footer').classList.add('active');
+  document.getElementById('backBtn').classList.add('active');
+  startTimer();
+
+  const typing = addTyping();
+  const res = await fetch('/api/interview', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ sessionId, candidate: currentCandidate }),
+  });
+  const data = await res.json();
+  typing.remove();
+  addMsg(data.reply, 'bot');
+  updateProgress(data.progress);
+}
+
+document.getElementById('startBtn').addEventListener('click', () => {
+  const idx = document.getElementById('candidateSelect').value;
+  currentCandidate = candidates[idx];
+
+  const hasNoMissions = !currentCandidate.missions || currentCandidate.missions.length === 0;
+  if (hasNoMissions && currentCandidate.isOwnProfile) {
+    startAssessment();
+    return;
+  }
+  beginInterview();
+});
+
+document.getElementById('chatForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const input = document.getElementById('messageInput');
+  const message = input.value.trim();
+  if (!message) return;
+  addMsg(message, 'user');
+  input.value = '';
+  document.getElementById('sendBtn').disabled = true;
+
+  const typing = addTyping();
+  const res = await fetch('/api/interview', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ sessionId, message }),
+  });
+  const data = await res.json();
+  typing.remove();
+  addMsg(data.reply, 'bot');
+  updateProgress(data.progress);
+  document.getElementById('sendBtn').disabled = false;
+
+  if (data.done) {
+    stopTimer();
+    document.getElementById('footer').classList.remove('active');
+    document.getElementById('chat').classList.remove('active');
+    document.getElementById('feedbackWrap').style.display = 'block';
+    document.getElementById('backBtn').classList.add('active');
+    renderFeedback(data.feedback);
+    saveReportToHistory(data.feedback);
+  }
+});
+
+/* =======================================================================
+   Report History — completed interview reports are saved per logged-in
+   user in localStorage (there is no server-side user database, so this
+   keeps history consistent with how auth/profile already work here).
+======================================================================= */
+const REPORTS_KEY_PREFIX = 'aiInterviewReports:';
+
+function saveReportToHistory(feedback) {
+  const user = getCurrentUser();
+  if (!user || !feedback) return;
+  const key = REPORTS_KEY_PREFIX + user.email;
+  const existing = JSON.parse(localStorage.getItem(key) || '[]');
+  existing.unshift({
+    candidateName: currentCandidate ? currentCandidate.member.name : 'You',
+    completedAt: Date.now(),
+    feedback,
+  });
+  localStorage.setItem(key, JSON.stringify(existing.slice(0, 20)));
+}
+
+function getReportHistory() {
+  const user = getCurrentUser();
+  if (!user) return [];
+  return JSON.parse(localStorage.getItem(REPORTS_KEY_PREFIX + user.email) || '[]');
+}
+
+function renderHistory() {
+  const reports = getReportHistory();
+  const list = document.getElementById('historyList');
+  if (!reports.length) {
+    list.innerHTML = '<p style="color:var(--muted);font-size:13px;">No past interviews yet.</p>';
+    return;
+  }
+  list.innerHTML = reports.map((r, i) => `
+    <div class="card" style="cursor:pointer;" data-history-index="${i}">
+      <strong>${r.candidateName}</strong> — ${new Date(r.completedAt).toLocaleDateString()}
+      <div style="color:var(--muted);font-size:12px;">Readiness: ${r.feedback.readinessScore ?? '—'}/5 · ${r.feedback.readinessLabel || ''}</div>
+    </div>
+  `).join('');
+  list.querySelectorAll('[data-history-index]').forEach((el) => {
+    el.addEventListener('click', () => viewHistoryReport(Number(el.getAttribute('data-history-index'))));
+  });
+}
+
+function viewHistoryReport(i) {
+  const reports = getReportHistory();
+  const entry = reports[i];
+  if (!entry) return;
+  document.getElementById('historyScreen').style.display = 'none';
+  document.getElementById('feedbackWrap').style.display = 'block';
+  document.getElementById('backBtn').classList.add('active');
+  renderFeedback(entry.feedback);
+}
+
+function openHistory() {
+  document.getElementById('setup').style.display = 'none';
+  document.getElementById('historyScreen').style.display = 'block';
+  document.getElementById('backBtn').classList.add('active');
+  renderHistory();
+}
+
+document.getElementById('viewHistoryBtn').addEventListener('click', () => {
+  document.getElementById('profileMenu').classList.remove('open');
+  openHistory();
+});
+
+/* =======================================================================
+   Edit Profile — updates the logged-in user's name and the editable
+   fields on their own candidate profile, both stored in localStorage.
+======================================================================= */
+document.getElementById('editProfileBtn').addEventListener('click', () => {
+  document.getElementById('profileMenu').classList.remove('open');
+  const user = getCurrentUser();
+  if (!user) return;
+  const own = getOrCreateOwnCandidate(user);
+  document.getElementById('editName').value = user.name || '';
+  document.getElementById('editJobRole').value = own.member.jobRole || '';
+  document.getElementById('editYears').value = own.member.yearsExperience || 0;
+  document.getElementById('editProfileModal').style.display = 'flex';
+});
+
+document.getElementById('cancelProfileBtn').addEventListener('click', () => {
+  document.getElementById('editProfileModal').style.display = 'none';
+});
+
+document.getElementById('saveProfileBtn').addEventListener('click', () => {
+  const user = getCurrentUser();
+  if (!user) return;
+  const newName = document.getElementById('editName').value.trim();
+  const newJobRole = document.getElementById('editJobRole').value.trim();
+  const newYears = Number(document.getElementById('editYears').value) || 0;
+  if (!newName) return;
+
+  user.name = newName;
+  setCurrentUser(user);
+
+  const key = USER_CANDIDATE_PREFIX + user.email;
+  const own = getOrCreateOwnCandidate(user);
+  own.member.name = newName;
+  own.member.jobRole = newJobRole;
+  own.member.yearsExperience = newYears;
+  localStorage.setItem(key, JSON.stringify(own));
+  candidates[0] = own;
+
+  document.getElementById('profileName').textContent = newName;
+  document.getElementById('pmName').textContent = newName;
+  document.getElementById('profileAvatar').textContent = newName.charAt(0).toUpperCase();
+  document.getElementById('editProfileModal').style.display = 'none';
+});
+
+/* =======================================================================
+   Ask AI — a free-form Q&A box, separate from the structured interview.
+======================================================================= */
+document.getElementById('askAiBtn').addEventListener('click', () => {
+  document.getElementById('setup').style.display = 'none';
+  document.getElementById('askAiScreen').style.display = 'block';
+  document.getElementById('backBtn').classList.add('active');
+});
+
+document.getElementById('askAiSubmitBtn').addEventListener('click', async () => {
+  const input = document.getElementById('askAiInput');
+  const question = input.value.trim();
+  if (!question) return;
+  const answerEl = document.getElementById('askAiAnswer');
+  const btn = document.getElementById('askAiSubmitBtn');
+  btn.disabled = true;
+  answerEl.textContent = 'Thinking...';
+  try {
+    const res = await fetch('/api/ask', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ question }),
+    });
+    const data = await res.json();
+    answerEl.textContent = data.answer || 'Sorry, something went wrong.';
+  } catch (err) {
+    answerEl.textContent = 'Sorry, something went wrong. Please try again.';
+  }
+  btn.disabled = false;
+});
+
+function scoreColor(score) {
+  if (score >= 4) return 'var(--good)';
+  if (score >= 3) return 'var(--warn)';
+  return 'var(--bad)';
+}
+
+function renderFeedback(f) {
+  f = f || {};
+  const readiness = f.readinessScore ?? null;
+  const ringColor = readiness ? scoreColor(readiness) : 'var(--muted)';
+
+  const scoreRows = (f.topicScores || []).map(s => `
+    <div class="score-row">
+      <div class="name">${s.title}</div>
+      <div class="score-bar-track"><div class="score-bar-fill" style="width:${(s.score/5)*100}%; background:${scoreColor(s.score)}"></div></div>
+      <div class="score-num">${s.score.toFixed(1)}</div>
+    </div>
+  `).join('');
+
+  document.getElementById('feedback').innerHTML = `
+    <div class="card readiness-hero">
+      <div class="ring" style="border: 6px solid ${ringColor}; color:${ringColor}">${readiness ? readiness.toFixed(1) : '—'}</div>
+      <div class="label">${f.readinessLabel || ''}</div>
+    </div>
+    <div class="card">
+      <h2>Interview Feedback</h2>
+      <p style="color:var(--muted); font-size:14px;">${f.summary || ''}</p>
+      <h3>Per-topic scores</h3>
+      ${scoreRows || '<p style="color:var(--muted); font-size:13px;">No per-topic scores available.</p>'}
+      <h3>Strengths</h3><ul>${(f.strengths||[]).map(s=>`<li>${s}</li>`).join('')}</ul>
+      <h3>Gaps</h3><ul>${(f.gaps||[]).map(s=>`<li>${s}</li>`).join('')}</ul>
+      <h3>Next steps</h3><ul>${(f.next||[]).map(s=>`<li>${s}</li>`).join('')}</ul>
+      <button id="downloadBtn">Download report (.md)</button>
+    </div>
+  `;
+
+  document.getElementById('downloadBtn').addEventListener('click', () => {
+    const name = currentCandidate ? currentCandidate.member.name : 'candidate';
+    const lines = [
+      `# Interview Report — ${name}`,
+      ``,
+      `**Readiness score:** ${f.readinessScore ?? '—'} / 5 (${f.readinessLabel || ''})`,
+      ``,
+      `## Summary`,
+      f.summary || '',
+      ``,
+      `## Per-topic scores`,
+      ...(f.topicScores || []).map(s => `- ${s.title}: ${s.score.toFixed(1)}/5`),
+      ``,
+      `## Strengths`,
+      ...(f.strengths || []).map(s => `- ${s}`),
+      ``,
+      `## Gaps`,
+      ...(f.gaps || []).map(s => `- ${s}`),
+      ``,
+      `## Next steps`,
+      ...(f.next || []).map(s => `- ${s}`),
+    ];
+    const blob = new Blob([lines.join('\n')], { type: 'text/markdown' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `interview-report-${name.replace(/\s+/g,'-').toLowerCase()}.md`;
+    a.click();
+  });
+}
+</script>
+</body>
+</html>
