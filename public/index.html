@@ -114,7 +114,7 @@
   #authScreen h2 { margin-top:0; font-size:16px; }
   #authScreen p.subtext { color: var(--muted); font-size:12.5px; margin-top:-6px; }
   #authScreen label { display:block; font-size:12px; color: var(--muted); margin: 14px 0 6px; }
-  #authScreen input { width:100%; padding:10px 12px; background:var(--input-bg); border:1px solid var(--border); border-radius:8px; color: var(--text); font-size:14px; }
+  #authScreen input { width:100%; padding:11px 12px; background:var(--input-bg); border:1px solid var(--border); border-radius:8px; color: var(--text); font-size:14px; }
   #authScreen input:focus { outline: 1px solid var(--accent); border-color: var(--accent); }
   #authScreen .primaryBtn { margin-top:18px; width:100%; padding:12px; border:none; border-radius:8px; background: var(--accent); color:#05070c; font-weight:600; cursor:pointer; font-size:14px; }
   #authScreen .primaryBtn:hover { filter: brightness(1.08); }
@@ -201,7 +201,7 @@
 
   /* ---- setup screen ---- */
   #setup { max-width: 620px; margin: 40px auto; padding: 0 20px; flex: 1; overflow-y:auto; }
-  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 22px; margin-bottom:16px; }
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 25px; margin-bottom:19px; }
   #setup label { display: block; font-size: 12px; color: var(--muted); margin: 14px 0 6px; }
   #setup select { width: 100%; padding: 10px 12px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 14px; }
   #setup button { margin-top: 18px; width: 100%; padding: 12px; border: none; border-radius: 8px; background: var(--accent); color: #05070c; font-weight: 600; cursor: pointer; font-size: 14px; }
@@ -758,7 +758,7 @@ document.getElementById('authSubmitBtn').addEventListener('click', () => {
    123456789-abc123xyz.apps.googleusercontent.com).
    It's safe to leave it visible in this file — a Client ID is public
    by design, it's not a secret. */
-const GOOGLE_CLIENT_ID = '198400421711-cu544q3st7ba9kuinbjpbarnugbqbfml.apps.googleusercontent.com'; // <-- PASTE HERE
+const GOOGLE_CLIENT_ID = 'PASTE_YOUR_GOOGLE_CLIENT_ID_HERE'; // <-- PASTE HERE
 
 let googleTokenClient = null;
 
