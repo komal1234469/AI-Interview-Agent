@@ -7,7 +7,7 @@ The project was developed iteratively with AI assistance for feature planning, i
 ## AI Development Conversation
 
 An additional shared AI development conversation is available here:
-
+ 
 **Claude shared conversation:**  
 https://claude.ai/share/e0ad3d55-1c13-4a39-b080-8dba0ceb411f
 
