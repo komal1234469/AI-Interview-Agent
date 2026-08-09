@@ -127,6 +127,30 @@ Write the JSON evaluation now. 3-5 concise, concrete, actionable bullet points p
   }
 }
 
+/**
+ * Free-form "Ask AI" endpoint — answers any question, not limited to the interview flow.
+ * Used by the standalone "Ask AI" box in the demo UI.
+ */
+async function answerFreeQuestion(question) {
+  if (!question || !String(question).trim()) {
+    return "Please type a question first.";
+  }
+  if (!hasLLM()) {
+    return "AI mode is off right now (no ANTHROPIC_API_KEY configured on the server), so I can't answer free-form questions yet. Once a key is set, this will work.";
+  }
+  try {
+    const system = `You are a helpful, knowledgeable assistant embedded in an AI interview-prep tool for
+"The AI Cohort" (a 31-day applied AI engineering program). Answer the user's question clearly,
+accurately, and concisely — a few sentences to a short paragraph unless they ask for more detail.
+You are not limited to interview topics; answer whatever they ask.`;
+    const text = await callClaude(system, [{ role: "user", content: String(question) }], 500);
+    return text || "I couldn't generate an answer to that — try rephrasing the question.";
+  } catch (err) {
+    console.error("[llm] answerFreeQuestion fallback:", err.message);
+    return "Something went wrong answering that question. Please try again in a moment.";
+  }
+}
+
 function formatTranscript(transcript) {
   if (!transcript || !transcript.length) return "(none yet)";
   return transcript
@@ -134,4 +158,4 @@ function formatTranscript(transcript) {
     .join("\n\n");
 }
 
-module.exports = { generateQuestion, generateFollowUp, generateFeedback, hasLLM };
+module.exports = { generateQuestion, generateFollowUp, generateFeedback, answerFreeQuestion, hasLLM };
