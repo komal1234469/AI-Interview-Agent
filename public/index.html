@@ -121,6 +121,26 @@
   #authScreen .switchLine a { color: var(--accent); text-decoration:none; cursor:pointer; }
   #authScreen .authError { display:none; background: #2a1518; border:1px solid #5c2a2f; color: var(--bad); font-size:12.5px; padding:8px 10px; border-radius:7px; margin-top:12px; }
   #authScreen .authError.show { display:block; }
+  .googleBtn {
+    width:100%; display:flex; align-items:center; justify-content:center; gap:10px;
+    padding:10px 12px; border-radius:8px; border:1px solid #dadce0; background:#ffffff;
+    color:#3c4043; font-size:14px; font-weight:600; cursor:pointer; margin-top:4px;
+  }
+  .googleBtn:hover { background:#f7f8f8; border-color:#c9cdd2; filter:none; }
+  /* Must beat the site-wide `button {...} !important` theme rule below,
+     which otherwise forces every <button> into the purple/cyan gradient. */
+  #googleAuthBtn, #googleAuthBtn:hover {
+    background:#ffffff !important;
+    border:1px solid #dadce0 !important;
+    color:#3c4043 !important;
+    box-shadow:none !important;
+  }
+  #googleAuthBtn:hover { background:#f7f8f8 !important; border-color:#c9cdd2 !important; }
+  .authDivider { display:flex; align-items:center; gap:10px; color: var(--muted); font-size:11.5px; margin:16px 0 2px; }
+  .authDivider::before, .authDivider::after { content:''; flex:1; height:1px; background: var(--border); }
+  .forgotLine { text-align:right; margin-top:8px; }
+  .forgotLine a, .switchLine a, #backToLoginLink { color: var(--accent); text-decoration:none; cursor:pointer; font-size:12.5px; }
+  .forgotNote { color: var(--muted); font-size:11.5px; margin-top:10px; line-height:1.5; }
 
   .authHeroPanel {
     flex: 1 1 0;
@@ -428,6 +448,7 @@
 
 
 </style>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
   <header>
@@ -464,9 +485,21 @@
     <div class="authFormPanel">
       <div class="inner">
         <p id="authTagline">"Don't just finish the cohort — be ready to defend it."</p>
-        <div class="card">
+
+        <div class="card" id="authCard">
           <h2 id="authTitle">Log in</h2>
           <p class="subtext" id="authSubtext">Log in to start your mock interview.</p>
+
+          <button type="button" class="googleBtn" id="googleAuthBtn">
+            <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true" style="flex-shrink:0;">
+              <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.6-6 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 8 3l6-6C34.5 5.1 29.6 3 24 3 12.4 3 3 12.4 3 24s9.4 21 21 21 21-9.4 21-21c0-1.4-.1-2.7-.4-3.5z"/>
+              <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.5 15.1 18.9 12 24 12c3.1 0 5.8 1.1 8 3l6-6C34.5 5.1 29.6 3 24 3 16.3 3 9.7 7.3 6.3 14.7z"/>
+              <path fill="#4CAF50" d="M24 45c5.4 0 10.4-2.1 14.1-5.6l-6.5-5.5C29.6 35.6 26.9 36.5 24 36.5c-5.2 0-9.6-3.5-11.2-8.2l-6.6 5.1C9.5 40.6 16.2 45 24 45z"/>
+              <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.1-4 5.5l6.5 5.5C41.6 35 45 30 45 24c0-1.4-.1-2.7-.4-3.5z"/>
+            </svg>
+            <span>Continue with Google</span>
+          </button>
+          <div class="authDivider"><span>or</span></div>
 
           <div id="signupNameWrap" style="display:none;">
             <label for="authName">Name</label>
@@ -478,6 +511,7 @@
 
           <label for="authPassword">Password</label>
           <input id="authPassword" type="password" placeholder="••••••••" autocomplete="current-password" />
+          <div class="forgotLine" id="forgotLine"><a id="forgotLink">Forgot password?</a></div>
 
           <button class="primaryBtn" id="authSubmitBtn">Log in</button>
           <div class="authError" id="authError"></div>
@@ -487,8 +521,30 @@
             <a id="switchLink">Sign up</a>
           </div>
         </div>
+
+        <div class="card" id="forgotCard" style="display:none;">
+          <h2 id="forgotTitle">Reset password</h2>
+          <p class="subtext" id="forgotSubtext">Enter the email on your account.</p>
+
+          <label for="forgotEmail">Email</label>
+          <input id="forgotEmail" type="email" placeholder="you@example.com" autocomplete="email" />
+
+          <div id="forgotStep2" style="display:none;">
+            <label for="forgotNewPassword">New password</label>
+            <input id="forgotNewPassword" type="password" placeholder="At least 6 characters" autocomplete="new-password" />
+          </div>
+
+          <button class="primaryBtn" id="forgotSubmitBtn">Continue</button>
+          <div class="authError" id="forgotError"></div>
+          <p class="forgotNote">This is a demo — there's no email server behind this, so resetting just updates the password stored in your browser.</p>
+
+          <div class="switchLine">
+            <a id="backToLoginLink">Back to log in</a>
+          </div>
+        </div>
       </div>
     </div>
+
 
     <div class="authHeroPanel">
       <div class="orbGlow"></div>
@@ -502,6 +558,7 @@
       </div>
     </div>
   </div>
+
 
   <div id="setup" style="display:none;">
     <div class="card">
@@ -621,6 +678,11 @@ function getCurrentUser() {
 function setCurrentUser(user) { localStorage.setItem(SESSION_KEY, JSON.stringify(user)); }
 function clearCurrentUser() { localStorage.removeItem(SESSION_KEY); }
 
+// Real email format check — user@domain.tld, any domain, not gmail-specific.
+function isValidEmail(v) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(v || '').trim());
+}
+
 function showAuthError(msg) {
   const el = document.getElementById('authError');
   el.textContent = msg;
@@ -642,6 +704,7 @@ function setAuthMode(mode) {
   document.getElementById('authSubmitBtn').textContent = isSignup ? 'Sign up' : 'Log in';
   document.getElementById('switchText').textContent = isSignup ? 'Already have an account?' : "Don't have an account?";
   document.getElementById('switchLink').textContent = isSignup ? 'Log in' : 'Sign up';
+  document.getElementById('forgotLine').style.display = isSignup ? 'none' : 'block';
 }
 
 document.getElementById('switchLink').addEventListener('click', () => {
@@ -655,22 +718,174 @@ document.getElementById('authSubmitBtn').addEventListener('click', () => {
   const name = document.getElementById('authName').value.trim();
 
   if (!email || !password) { showAuthError('Please fill in email and password.'); return; }
+  if (!isValidEmail(email)) { showAuthError('Enter a valid email address (e.g. name@domain.com).'); return; }
 
   const users = getUsers();
 
   if (authMode === 'signup') {
     if (!name) { showAuthError('Please enter your name.'); return; }
+    if (password.length < 6) { showAuthError('Password must be at least 6 characters.'); return; }
     if (users[email]) { showAuthError('An account with this email already exists. Log in instead.'); return; }
-    users[email] = { name, email, password };
+    users[email] = { name, email, password, provider: 'password' };
     saveUsers(users);
     setCurrentUser({ name, email });
     enterApp();
   } else {
     const u = users[email];
-    if (!u || u.password !== password) { showAuthError('Incorrect email or password.'); return; }
+    if (!u) { showAuthError('No account found with this email — sign up first.'); return; }
+    if (u.provider === 'google' && !u.password) {
+      showAuthError('This account uses Google sign-in — use "Continue with Google" instead.');
+      return;
+    }
+    if (u.password !== password) { showAuthError('Incorrect email or password.'); return; }
     setCurrentUser({ name: u.name, email: u.email });
     enterApp();
   }
+});
+
+/* ---- Continue with Google (REAL Google sign-in via Google Identity
+   Services) ----
+   PASTE YOUR CLIENT ID BELOW — the one line marked "PASTE HERE".
+   Get it from Google Cloud Console → APIs & Services → Clients →
+   your Web application client → "Client ID" (looks like
+   123456789-abc123xyz.apps.googleusercontent.com).
+   It's safe to leave it visible in this file — a Client ID is public
+   by design, it's not a secret. */
+const GOOGLE_CLIENT_ID = '198400421711-cu544q3st7ba9kuinbjpbarnugbqbfml.apps.googleusercontent.com'; // <-- PASTE HERE
+
+let googleTokenClient = null;
+
+function initGoogleAuth() {
+  if (!window.google || !google.accounts || !google.accounts.oauth2) return false;
+  googleTokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: GOOGLE_CLIENT_ID,
+    scope: 'openid email profile',
+    callback: handleGoogleToken,
+  });
+  return true;
+}
+
+async function handleGoogleToken(tokenResponse) {
+  hideAuthError();
+  if (!tokenResponse || !tokenResponse.access_token) {
+    showAuthError('Google sign-in was cancelled.');
+    return;
+  }
+  try {
+    const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+      headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
+    });
+    if (!res.ok) throw new Error('userinfo request failed');
+    const profile = await res.json();
+    const cleanEmail = (profile.email || '').trim().toLowerCase();
+    if (!cleanEmail) { showAuthError('Could not read your email from Google.'); return; }
+
+    const users = getUsers();
+    let user = users[cleanEmail];
+    if (!user) {
+      user = { name: profile.name || cleanEmail.split('@')[0], email: cleanEmail, password: null, provider: 'google' };
+      users[cleanEmail] = user;
+      saveUsers(users);
+    }
+    setCurrentUser({ name: user.name, email: user.email });
+    enterApp();
+  } catch (err) {
+    showAuthError('Google sign-in failed — please try again.');
+  }
+}
+
+// The GIS script (accounts.google.com/gsi/client) loads with
+// async/defer, so it may not be ready the instant this runs — poll
+// briefly until it is, then wire up the token client once.
+(function waitForGoogleGIS(attemptsLeft = 25) {
+  if (initGoogleAuth()) return;
+  if (attemptsLeft <= 0) return; // gives up quietly; button shows a clear error on click instead
+  setTimeout(() => waitForGoogleGIS(attemptsLeft - 1), 200);
+})();
+
+document.getElementById('googleAuthBtn').addEventListener('click', () => {
+  hideAuthError();
+  if (!GOOGLE_CLIENT_ID || GOOGLE_CLIENT_ID === 'PASTE_YOUR_GOOGLE_CLIENT_ID_HERE') {
+    showAuthError('Google sign-in isn\'t set up yet — paste your Client ID into GOOGLE_CLIENT_ID near the top of the script.');
+    return;
+  }
+  if (!googleTokenClient) {
+    showAuthError('Google sign-in is still loading — give it a second and try again.');
+    return;
+  }
+  googleTokenClient.requestAccessToken();
+});
+
+/* ---- Forgot password ---- */
+let forgotStage = 'email'; // 'email' | 'reset'
+
+function showForgotPanel() {
+  hideAuthError();
+  forgotStage = 'email';
+  document.getElementById('authCard').style.display = 'none';
+  document.getElementById('forgotCard').style.display = 'block';
+  document.getElementById('forgotStep2').style.display = 'none';
+  document.getElementById('forgotSubmitBtn').textContent = 'Continue';
+  document.getElementById('forgotEmail').value = document.getElementById('authEmail').value.trim();
+  document.getElementById('forgotEmail').disabled = false;
+  document.getElementById('forgotError').classList.remove('show');
+}
+function hideForgotPanel() {
+  document.getElementById('authCard').style.display = 'block';
+  document.getElementById('forgotCard').style.display = 'none';
+}
+
+document.getElementById('forgotLink').addEventListener('click', showForgotPanel);
+document.getElementById('backToLoginLink').addEventListener('click', hideForgotPanel);
+
+document.getElementById('forgotSubmitBtn').addEventListener('click', () => {
+  const errEl = document.getElementById('forgotError');
+  errEl.classList.remove('show');
+  const email = document.getElementById('forgotEmail').value.trim().toLowerCase();
+
+  if (!isValidEmail(email)) {
+    errEl.textContent = 'Enter a valid email address.';
+    errEl.classList.add('show');
+    return;
+  }
+
+  const users = getUsers();
+
+  if (forgotStage === 'email') {
+    const user = users[email];
+    if (!user) {
+      errEl.textContent = 'No account found with this email.';
+      errEl.classList.add('show');
+      return;
+    }
+    if (user.provider === 'google' && !user.password) {
+      errEl.textContent = 'This account uses Google sign-in and has no password to reset.';
+      errEl.classList.add('show');
+      return;
+    }
+    forgotStage = 'reset';
+    document.getElementById('forgotStep2').style.display = 'block';
+    document.getElementById('forgotEmail').disabled = true;
+    document.getElementById('forgotSubmitBtn').textContent = 'Set new password';
+    return;
+  }
+
+  // forgotStage === 'reset'
+  const newPassword = document.getElementById('forgotNewPassword').value;
+  if (!newPassword || newPassword.length < 6) {
+    errEl.textContent = 'New password must be at least 6 characters.';
+    errEl.classList.add('show');
+    return;
+  }
+  users[email].password = newPassword;
+  users[email].provider = 'password';
+  saveUsers(users);
+
+  hideForgotPanel();
+  setAuthMode('login');
+  document.getElementById('authEmail').value = email;
+  document.getElementById('authPassword').value = '';
+  showAuthError('Password updated — log in with your new password.');
 });
 
 function enterApp() {
