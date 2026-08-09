@@ -56,9 +56,9 @@
     flex-shrink: 0;
   }
   header .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--good); box-shadow: 0 0 8px var(--good); }
-  header h1 { font-size:15.5px; margin: 0; font-weight: 600; letter-spacing: .2px; flex-shrink:0; }
-  header span.sub { color: var(--muted); font-size:12.5px; }
-  header .timer { font-variant-numeric: tabular-nums; color: var(--muted); font-size:13.5px; display:none; }
+  header h1 { font-size: 15px; margin: 0; font-weight: 600; letter-spacing: .2px; flex-shrink:0; }
+  header span.sub { color: var(--muted); font-size: 12px; }
+  header .timer { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 13px; display:none; }
   header .timer.active { display:block; }
 
   #backBtn {
@@ -89,19 +89,19 @@
     background: var(--panel2);
     color: var(--text);
     cursor: pointer;
-    font-size:15.5px;
+    font-size: 15px;
     flex-shrink: 0;
   }
   #themeToggle:hover { border-color: var(--accent); }
 
   #profileChip { display:none; align-items:center; gap:8px; cursor:pointer; position:relative; }
   #profileChip.active { display:flex; }
-  #profileAvatar { width:28px; height:28px; border-radius:50%; background: linear-gradient(135deg, var(--accent), var(--accent2)); display:flex; align-items:center; justify-content:center; font-size:12.5px; font-weight:700; color:#05070c; flex-shrink:0; }
-  #profileName { font-size:13.5px; color: var(--text); }
+  #profileAvatar { width:28px; height:28px; border-radius:50%; background: linear-gradient(135deg, var(--accent), var(--accent2)); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#05070c; flex-shrink:0; }
+  #profileName { font-size: 13px; color: var(--text); }
   #profileMenu { display:none; position:absolute; top: 38px; right: 0; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 10px; min-width: 180px; z-index: 20; box-shadow: 0 10px 30px rgba(0,0,0,.4); }
   #profileMenu.open { display:block; }
-  #profileMenu .pmName { font-size:13.5px; font-weight:600; margin-bottom:2px; }
-  #profileMenu .pmEmail { font-size:12.5px; color: var(--muted); margin-bottom:10px; word-break: break-all; }
+  #profileMenu .pmName { font-size: 13px; font-weight:600; margin-bottom:2px; }
+  #profileMenu .pmEmail { font-size: 12px; color: var(--muted); margin-bottom:10px; word-break: break-all; }
   #profileMenu button { width:100%; padding:8px; border:1px solid var(--border); background: var(--panel2); color: var(--text); border-radius:7px; cursor:pointer; font-size:12.5px; }
   #profileMenu button:hover { border-color: var(--bad); color: var(--bad); }
 
@@ -110,13 +110,13 @@
   .authFormPanel { flex: 1 1 0; box-sizing: border-box; display:flex; flex-direction:column; justify-content:center; align-items:center; padding: 40px; overflow-y:auto; background: var(--bg); scrollbar-width:none; -ms-overflow-style:none; }
   .authFormPanel::-webkit-scrollbar { display:none; width:0; height:0; }
   .authFormPanel .inner { width:100%; max-width: 380px; }
-  #authTagline { text-align:center; font-size:14.5px; color: var(--muted); font-style: italic; margin: 0 0 20px; line-height: 1.5; }
-  #authScreen h2 { margin-top:0; font-size:16.5px; }
+  #authTagline { text-align:center; font-size: 14px; color: var(--muted); font-style: italic; margin: 0 0 20px; line-height: 1.5; }
+  #authScreen h2 { margin-top:0; font-size:16px; }
   #authScreen p.subtext { color: var(--muted); font-size:12.5px; margin-top:-6px; }
-  #authScreen label { display:block; font-size:12.5px; color: var(--muted); margin: 14px 0 6px; }
-  #authScreen input { width:100%; padding:11px 12px; background:var(--input-bg); border:1px solid var(--border); border-radius:8px; color: var(--text); font-size:14.5px; }
+  #authScreen label { display:block; font-size:12px; color: var(--muted); margin: 14px 0 6px; }
+  #authScreen input { width:100%; padding:11px 12px; background:var(--input-bg); border:1px solid var(--border); border-radius:8px; color: var(--text); font-size:14px; }
   #authScreen input:focus { outline: 1px solid var(--accent); border-color: var(--accent); }
-  #authScreen .primaryBtn { margin-top:18px; width:100%; padding:12px; border:none; border-radius:8px; background: var(--accent); color:#05070c; font-weight:600; cursor:pointer; font-size:14.5px; }
+  #authScreen .primaryBtn { margin-top:18px; width:100%; padding:12px; border:none; border-radius:8px; background: var(--accent); color:#05070c; font-weight:600; cursor:pointer; font-size:14px; }
   #authScreen .primaryBtn:hover { filter: brightness(1.08); }
   #authScreen .switchLine { text-align:center; margin-top:14px; font-size:12.5px; color: var(--muted); }
   #authScreen .switchLine a { color: var(--accent); text-decoration:none; cursor:pointer; }
@@ -125,7 +125,7 @@
   .googleBtn {
     width:100%; display:flex; align-items:center; justify-content:center; gap:10px;
     padding:10px 12px; border-radius:8px; border:1px solid #dadce0; background:#ffffff;
-    color:#3c4043; font-size:14.5px; font-weight:600; cursor:pointer; margin-top:4px;
+    color:#3c4043; font-size:14px; font-weight:600; cursor:pointer; margin-top:4px;
   }
   .googleBtn:hover { background:#f7f8f8; border-color:#c9cdd2; filter:none; }
   /* Must beat the site-wide `button {...} !important` theme rule below,
@@ -179,10 +179,10 @@
     animation: floatOrb 6s ease-in-out infinite;
   }
   @keyframes floatOrb { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
-  .heroTitle { font-size:21.5px; font-weight: 700; margin: 0 0 8px; }
-  .heroSub { font-size:13.5px; color: var(--muted); max-width: 320px; margin: 0 0 26px; line-height: 1.65; }
+  .heroTitle { font-size: 21px; font-weight: 700; margin: 0 0 8px; }
+  .heroSub { font-size: 13px; color: var(--muted); max-width: 320px; margin: 0 0 26px; line-height: 1.65; }
   .heroFeatures { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; max-width: 360px; }
-  .heroChip { background: var(--panel2); border:1px solid var(--border); padding:8px 14px; border-radius:999px; font-size:12.5px; color: var(--text); }
+  .heroChip { background: var(--panel2); border:1px solid var(--border); padding:8px 14px; border-radius:999px; font-size:12px; color: var(--text); }
 
   @media (max-width: 760px) {
     .authHeroPanel { display: none; }
@@ -192,40 +192,40 @@
   /* ---- progress bar ---- */
   #progressWrap { display: none; padding: 10px 24px 12px; border-bottom: 1px solid var(--border); flex-shrink:0; }
   #progressWrap.active { display: block; }
-  .progress-top { display:flex; justify-content:space-between; align-items:center; font-size:12.5px; color:var(--muted); margin-bottom:8px; }
+  .progress-top { display:flex; justify-content:space-between; align-items:center; font-size:12px; color:var(--muted); margin-bottom:8px; }
   .progress-track { height: 6px; background: #1a1e28; border-radius: 999px; overflow:hidden; }
   .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius:999px; transition: width .4s ease; }
-  #topicChip { display:inline-flex; align-items:center; gap:6px; margin-top:8px; padding:4px 10px; background: var(--panel2); border:1px solid var(--border); border-radius: 999px; font-size:12.5px; color: var(--text); }
+  #topicChip { display:inline-flex; align-items:center; gap:6px; margin-top:8px; padding:4px 10px; background: var(--panel2); border:1px solid var(--border); border-radius: 999px; font-size:12px; color: var(--text); }
   #topicChip .pulse { width:6px; height:6px; border-radius:50%; background: var(--accent); animation: pulse 1.4s infinite; }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
 
   /* ---- setup screen ---- */
   #setup { max-width: 620px; margin: 40px auto; padding: 0 20px; flex: 1; overflow-y:auto; }
   .card { background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 25px; margin-bottom:19px; }
-  #setup label { display: block; font-size:12.5px; color: var(--muted); margin: 14px 0 6px; }
-  #setup select { width: 100%; padding: 10px 12px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size:14.5px; }
-  #setup button { margin-top: 18px; width: 100%; padding: 12px; border: none; border-radius: 8px; background: var(--accent); color: #05070c; font-weight: 600; cursor: pointer; font-size:14.5px; }
+  #setup label { display: block; font-size: 12px; color: var(--muted); margin: 14px 0 6px; }
+  #setup select { width: 100%; padding: 10px 12px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 14px; }
+  #setup button { margin-top: 18px; width: 100%; padding: 12px; border: none; border-radius: 8px; background: var(--accent); color: #05070c; font-weight: 600; cursor: pointer; font-size: 14px; }
   #setup button:hover { filter: brightness(1.08); }
   #setup button:disabled { opacity: .5; cursor: not-allowed; filter: none; }
-  #noMissionsNote { display:none; margin-top:10px; font-size:12.5px; color: var(--warn); background: #241d0f; border:1px solid #4a3a12; border-radius:7px; padding:8px 10px; }
+  #noMissionsNote { display:none; margin-top:10px; font-size:12px; color: var(--warn); background: #241d0f; border:1px solid #4a3a12; border-radius:7px; padding:8px 10px; }
   #noMissionsNote.show { display:block; }
 
   /* ---- assessment quiz screen ---- */
   #assessmentScreen { display:none; max-width: 620px; margin: 40px auto; padding: 0 20px; flex: 1; overflow-y:auto; }
   #assessmentScreen .card { }
-  #quizProgressTop { display:flex; justify-content:space-between; align-items:center; font-size:12.5px; color:var(--muted); margin-bottom:10px; }
+  #quizProgressTop { display:flex; justify-content:space-between; align-items:center; font-size:12px; color:var(--muted); margin-bottom:10px; }
   #quizProgressTrack { height:6px; background:#1a1e28; border-radius:999px; overflow:hidden; margin-bottom:20px; }
   #quizProgressFill { height:100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius:999px; transition: width .3s ease; }
-  #quizQuestion { font-size:16.5px; font-weight:600; margin-bottom:4px; }
+  #quizQuestion { font-size:16px; font-weight:600; margin-bottom:4px; }
   #quizSubtext { font-size:12.5px; color:var(--muted); margin-bottom:18px; }
   #quizOptions { display:flex; flex-direction:column; gap:10px; }
-  .quizOptBtn { text-align:left; padding:13px 16px; background:var(--input-bg); border:1px solid var(--border); border-radius:10px; color:var(--text); font-size:14.5px; cursor:pointer; transition: border-color .15s ease, background .15s ease; }
+  .quizOptBtn { text-align:left; padding:13px 16px; background:var(--input-bg); border:1px solid var(--border); border-radius:10px; color:var(--text); font-size:14px; cursor:pointer; transition: border-color .15s ease, background .15s ease; }
   .quizOptBtn:hover { border-color: var(--accent); background:#12151d; }
-  #quizDoneNote { display:none; text-align:center; padding:20px; color: var(--good); font-size:14.5px; }
+  #quizDoneNote { display:none; text-align:center; padding:20px; color: var(--good); font-size:14px; }
   #candidateStats { display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; margin-top:14px; }
   .stat { background:var(--input-bg); border:1px solid var(--border); border-radius:10px; padding:10px 12px; }
-  .stat .val { font-size:18.5px; font-weight:700; }
-  .stat .lbl { font-size:11.5px; color: var(--muted); margin-top:2px; }
+  .stat .val { font-size: 18px; font-weight:700; }
+  .stat .lbl { font-size: 11px; color: var(--muted); margin-top:2px; }
 
   main { flex: 1; overflow-y: auto; padding: 24px; display: none; }
   main.active { display: block; }
@@ -233,7 +233,7 @@
   .msg { padding: 12px 16px; border-radius: 12px; line-height: 1.5; font-size: 14.5px; white-space: pre-wrap; max-width: 85%; }
   .msg.bot { background: var(--bot); border: 1px solid var(--border); align-self: flex-start; border-bottom-left-radius: 4px; }
   .msg.user { background: var(--user); align-self: flex-end; border-bottom-right-radius: 4px; }
-  .msg.system { align-self: center; color: var(--muted); font-size:12.5px; background: none; }
+  .msg.system { align-self: center; color: var(--muted); font-size: 12px; background: none; }
   .typingDots { display:inline-flex; gap:4px; align-items:center; }
   .typingDots span { width:5px; height:5px; border-radius:50%; background:var(--muted); animation: bounce 1.2s infinite; }
   .typingDots span:nth-child(2) { animation-delay: .15s; }
@@ -244,8 +244,8 @@
   #feedbackWrap { display:none; flex:1; overflow-y:auto; padding: 24px; }
   #feedback { max-width: 720px; margin: 0 auto; }
   .readiness-hero { text-align:center; padding: 24px; margin-bottom: 18px; }
-  .readiness-hero .ring { width:110px; height:110px; border-radius:50%; margin: 0 auto 12px; display:flex; align-items:center; justify-content:center; font-size:26.5px; font-weight:800; }
-  .readiness-hero .label { font-size:14.5px; color: var(--muted); }
+  .readiness-hero .ring { width:110px; height:110px; border-radius:50%; margin: 0 auto 12px; display:flex; align-items:center; justify-content:center; font-size:26px; font-weight:800; }
+  .readiness-hero .label { font-size: 14px; color: var(--muted); }
   #feedback h2 { margin-top: 0; font-size: 16.5px; }
   #feedback h3 { font-size: 12.5px; color: var(--accent); text-transform: uppercase; letter-spacing: .6px; margin: 18px 0 10px; }
   #feedback ul { margin: 0; padding-left: 20px; font-size: 14.5px; line-height: 1.7; }
@@ -268,7 +268,7 @@
     flex-shrink: 0;
     text-align: center;
     padding: 8px 10px;
-    font-size: 13px;
+    font-size: 12.5 px;
     color: var(--muted);
     border-top: 1px solid var(--border);
     letter-spacing: .2px;
@@ -537,7 +537,7 @@
           <div id="forgotStepCode" style="display:none;">
             <label for="forgotCode">6-digit code</label>
             <input id="forgotCode" type="text" inputmode="numeric" maxlength="6" placeholder="123456" autocomplete="one-time-code" />
-            <p class="hint" id="forgotCodeHint" style="color:var(--muted); font-size:12.5px; margin-top:6px;"></p>
+            <p class="hint" id="forgotCodeHint" style="color:var(--muted); font-size:12px; margin-top:6px;"></p>
           </div>
 
           <div id="forgotStep2" style="display:none;">
@@ -610,9 +610,9 @@
       <label style="display:block; font-size:12.5px; color:var(--muted); margin:14px 0 6px;">Job Role</label>
       <input id="editJobRole" type="text" style="width:100%; padding:10px 12px; background:var(--input-bg); border:1px solid var(--border); border-radius:8px; color:var(--text); font-size:14.5px;" />
       <label style="display:block; font-size:12.5px; color:var(--muted); margin:14px 0 6px;">Years of Experience</label>
-      <input id="editYears" type="number" min="0" style="width:100%; padding:10px 12px; background:var(--input-bg); border:1px solid var(--border); border-radius:8px; color:var(--text); font-size:14.5px;" />
-      <button id="saveProfileBtn" style="margin-top:16px; width:100%; padding:11px; border:none; border-radius:8px; font-weight:600; cursor:pointer; font-size:14.5px;">Save</button>
-      <button id="cancelProfileBtn" style="margin-top:8px; width:100%; padding:11px; border:1px solid var(--border); border-radius:8px; background:var(--panel2)!important; color:var(--text)!important; cursor:pointer; font-size:14.5px;">Cancel</button>
+      <input id="editYears" type="number" min="0" style="width:100%; padding:10px 12px; background:var(--input-bg); border:1px solid var(--border); border-radius:8px; color:var(--text); font-size:14px;" />
+      <button id="saveProfileBtn" style="margin-top:16px; width:100%; padding:11px; border:none; border-radius:8px; font-weight:600; cursor:pointer; font-size:14px;">Save</button>
+      <button id="cancelProfileBtn" style="margin-top:8px; width:100%; padding:11px; border:1px solid var(--border); border-radius:8px; background:var(--panel2)!important; color:var(--text)!important; cursor:pointer; font-size:14px;">Cancel</button>
     </div>
   </div>
 
@@ -1349,13 +1349,13 @@ function renderHistory() {
   const reports = getReportHistory();
   const list = document.getElementById('historyList');
   if (!reports.length) {
-    list.innerHTML = '<p style="color:var(--muted);font-size:13.5px;">No past interviews yet.</p>';
+    list.innerHTML = '<p style="color:var(--muted);font-size:13px;">No past interviews yet.</p>';
     return;
   }
   list.innerHTML = reports.map((r, i) => `
     <div class="card" style="cursor:pointer;" data-history-index="${i}">
       <strong>${r.candidateName}</strong> — ${new Date(r.completedAt).toLocaleDateString()}
-      <div style="color:var(--muted);font-size:12.5px;">Readiness: ${r.feedback.readinessScore ?? '—'}/5 · ${r.feedback.readinessLabel || ''}</div>
+      <div style="color:var(--muted);font-size:12px;">Readiness: ${r.feedback.readinessScore ?? '—'}/5 · ${r.feedback.readinessLabel || ''}</div>
     </div>
   `).join('');
   list.querySelectorAll('[data-history-index]').forEach((el) => {
@@ -1454,6 +1454,7 @@ document.getElementById('askAiSubmitBtn').addEventListener('click', async () => 
     });
     const data = await res.json();
     answerEl.textContent = data.answer || 'Sorry, something went wrong.';
+    input.value = '';
   } catch (err) {
     answerEl.textContent = 'Sorry, something went wrong. Please try again.';
   }
@@ -1486,9 +1487,9 @@ function renderFeedback(f) {
     </div>
     <div class="card">
       <h2>Interview Feedback</h2>
-      <p style="color:var(--muted); font-size:14.5px;">${f.summary || ''}</p>
+      <p style="color:var(--muted); font-size:14px;">${f.summary || ''}</p>
       <h3>Per-topic scores</h3>
-      ${scoreRows || '<p style="color:var(--muted); font-size:13.5px;">No per-topic scores available.</p>'}
+      ${scoreRows || '<p style="color:var(--muted); font-size:13px;">No per-topic scores available.</p>'}
       <h3>Strengths</h3><ul>${(f.strengths||[]).map(s=>`<li>${s}</li>`).join('')}</ul>
       <h3>Gaps</h3><ul>${(f.gaps||[]).map(s=>`<li>${s}</li>`).join('')}</ul>
       <h3>Next steps</h3><ul>${(f.next||[]).map(s=>`<li>${s}</li>`).join('')}</ul>
