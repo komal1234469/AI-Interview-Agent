@@ -13,7 +13,7 @@ const hasLLM = () => Boolean(API_KEY);
  * (this app only ever needs one-shot calls, not multi-turn history, since we pass the full
  * transcript as text inside userText each time).
  */
-async function callGemini(system, userText, maxTokens = 400) {
+async function callGemini(system, userText, maxTokens = 600) {
   const res = await fetch(`${API_URL}?key=${API_KEY}`, {
     method: "POST",
     headers: { "content-type": "application/json" },
@@ -66,7 +66,7 @@ Interview transcript so far (may be empty if this is the first question):
 ${formatTranscript(transcriptSoFar)}
 
 Write your NEXT message to the candidate: a brief natural transition (skip if this is the very first question) followed by exactly one interview question about this day's material.`;
-    const text = await callGemini(INTERVIEWER_SYSTEM, context, 300);
+    const text = await callGemini(INTERVIEWER_SYSTEM, context, 500);
     return text || templates.primaryQuestion(stop, candidate);
   } catch (err) {
     console.error("[llm] generateQuestion fallback:", err.message);
@@ -91,7 +91,7 @@ Decide the right adaptive follow-up:
 - If the answer was vague, very short, or dodged specifics, ask a clarifying question that forces a concrete example.
 - If the answer was solid and specific, push deeper: ask about a trade-off, failure mode, scaling concern, or a comparison to an alternative approach.
 Write ONE short natural follow-up question (with a brief reaction first), nothing else.`;
-    const text = await callGemini(INTERVIEWER_SYSTEM, context, 250);
+    const text = await callGemini(INTERVIEWER_SYSTEM, context, 450);
     return text || templates.followUpQuestion(stop, previousAnswer, transcriptSoFar.length);
   } catch (err) {
     console.error("[llm] generateFollowUp fallback:", err.message);
@@ -116,7 +116,7 @@ Full transcript:
 ${formatTranscript(transcript)}
 
 Write the JSON evaluation now. 3-5 concise, concrete, actionable bullet points per array.`;
-    const text = await callGemini(system, context, 700);
+    const text = await callGemini(system, context, 900);
     const cleaned = text.replace(/^```json\s*|\s*```$/g, "").trim();
     const parsed = JSON.parse(cleaned);
     if (parsed && parsed.summary && Array.isArray(parsed.strengths)) return parsed;
