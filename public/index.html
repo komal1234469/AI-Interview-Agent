@@ -107,7 +107,8 @@
 
   /* ---- auth screen ---- */
   #authScreen { display:flex; flex:1; overflow:hidden; }
-  .authFormPanel { flex: 1 1 0; box-sizing: border-box; display:flex; flex-direction:column; justify-content:center; align-items:center; padding: 40px; overflow-y:auto; background: var(--bg); }
+  .authFormPanel { flex: 1 1 0; box-sizing: border-box; display:flex; flex-direction:column; justify-content:center; align-items:center; padding: 40px; overflow-y:auto; background: var(--bg); scrollbar-width:none; -ms-overflow-style:none; }
+  .authFormPanel::-webkit-scrollbar { display:none; width:0; height:0; }
   .authFormPanel .inner { width:100%; max-width: 380px; }
   #authTagline { text-align:center; font-size: 14px; color: var(--muted); font-style: italic; margin: 0 0 20px; line-height: 1.5; }
   #authScreen h2 { margin-top:0; font-size:16px; }
@@ -529,6 +530,12 @@
           <label for="forgotEmail">Email</label>
           <input id="forgotEmail" type="email" placeholder="you@example.com" autocomplete="email" />
 
+          <div id="forgotStepCode" style="display:none;">
+            <label for="forgotCode">6-digit code</label>
+            <input id="forgotCode" type="text" inputmode="numeric" maxlength="6" placeholder="123456" autocomplete="one-time-code" />
+            <p class="hint" id="forgotCodeHint" style="color:var(--muted); font-size:11.5px; margin-top:6px;"></p>
+          </div>
+
           <div id="forgotStep2" style="display:none;">
             <label for="forgotNewPassword">New password</label>
             <input id="forgotNewPassword" type="password" placeholder="At least 6 characters" autocomplete="new-password" />
@@ -536,7 +543,7 @@
 
           <button class="primaryBtn" id="forgotSubmitBtn">Continue</button>
           <div class="authError" id="forgotError"></div>
-          <p class="forgotNote">This is a demo — there's no email server behind this, so resetting just updates the password stored in your browser.</p>
+          <p class="forgotNote">This is a demo with no real email server — so instead of emailing the code, we're showing it to you directly above. In a real deployment this step would email a one-time code instead.</p>
 
           <div class="switchLine">
             <a id="backToLoginLink">Back to log in</a>
@@ -751,7 +758,7 @@ document.getElementById('authSubmitBtn').addEventListener('click', () => {
    123456789-abc123xyz.apps.googleusercontent.com).
    It's safe to leave it visible in this file — a Client ID is public
    by design, it's not a secret. */
-const GOOGLE_CLIENT_ID = '198400421711-cu544q3st7ba9kuinbjpbarnugbqbfml.apps.googleusercontent.com'; // <-- PASTE HERE
+const GOOGLE_CLIENT_ID = 'PASTE_YOUR_GOOGLE_CLIENT_ID_HERE'; // <-- PASTE HERE
 
 let googleTokenClient = null;
 
@@ -816,18 +823,34 @@ document.getElementById('googleAuthBtn').addEventListener('click', () => {
   googleTokenClient.requestAccessToken();
 });
 
-/* ---- Forgot password ---- */
-let forgotStage = 'email'; // 'email' | 'reset'
+/* ---- Forgot password ----
+   Three steps: email -> code -> new password. Since this is a static
+   demo with no real email server, the "sent" code is shown directly in
+   the UI instead of being emailed — it's a UX placeholder for the real
+   flow, not an extra security gate (see forgotNote text). It does add
+   one real thing: a typo'd/wrong email no longer silently lets someone
+   straight through to setting a password with zero friction. */
+let forgotStage = 'email'; // 'email' | 'code' | 'reset'
+let forgotCode = null;
+let forgotAttempts = 0;
+
+function generateForgotCode() {
+  return String(Math.floor(100000 + Math.random() * 900000));
+}
 
 function showForgotPanel() {
   hideAuthError();
   forgotStage = 'email';
+  forgotCode = null;
+  forgotAttempts = 0;
   document.getElementById('authCard').style.display = 'none';
   document.getElementById('forgotCard').style.display = 'block';
+  document.getElementById('forgotStepCode').style.display = 'none';
   document.getElementById('forgotStep2').style.display = 'none';
-  document.getElementById('forgotSubmitBtn').textContent = 'Continue';
+  document.getElementById('forgotSubmitBtn').textContent = 'Send code';
   document.getElementById('forgotEmail').value = document.getElementById('authEmail').value.trim();
   document.getElementById('forgotEmail').disabled = false;
+  document.getElementById('forgotCode').value = '';
   document.getElementById('forgotError').classList.remove('show');
 }
 function hideForgotPanel() {
@@ -851,6 +874,7 @@ document.getElementById('forgotSubmitBtn').addEventListener('click', () => {
 
   const users = getUsers();
 
+  // ---- Step 1: email ----
   if (forgotStage === 'email') {
     const user = users[email];
     if (!user) {
@@ -863,14 +887,42 @@ document.getElementById('forgotSubmitBtn').addEventListener('click', () => {
       errEl.classList.add('show');
       return;
     }
-    forgotStage = 'reset';
-    document.getElementById('forgotStep2').style.display = 'block';
+
+    forgotCode = generateForgotCode();
+    forgotAttempts = 0;
+    forgotStage = 'code';
     document.getElementById('forgotEmail').disabled = true;
-    document.getElementById('forgotSubmitBtn').textContent = 'Set new password';
+    document.getElementById('forgotStepCode').style.display = 'block';
+    document.getElementById('forgotCodeHint').textContent =
+      `Demo mode — your code is ${forgotCode} (a real deployment would email this instead of showing it).`;
+    document.getElementById('forgotSubmitBtn').textContent = 'Verify code';
+    document.getElementById('forgotCode').focus();
     return;
   }
 
-  // forgotStage === 'reset'
+  // ---- Step 2: code ----
+  if (forgotStage === 'code') {
+    const entered = document.getElementById('forgotCode').value.trim();
+    if (entered !== forgotCode) {
+      forgotAttempts += 1;
+      if (forgotAttempts >= 5) {
+        errEl.textContent = 'Too many incorrect attempts — start over.';
+        errEl.classList.add('show');
+        showForgotPanel();
+        return;
+      }
+      errEl.textContent = `Incorrect code (${5 - forgotAttempts} attempts left).`;
+      errEl.classList.add('show');
+      return;
+    }
+    forgotStage = 'reset';
+    document.getElementById('forgotStep2').style.display = 'block';
+    document.getElementById('forgotSubmitBtn').textContent = 'Set new password';
+    document.getElementById('forgotNewPassword').focus();
+    return;
+  }
+
+  // ---- Step 3: new password ----
   const newPassword = document.getElementById('forgotNewPassword').value;
   if (!newPassword || newPassword.length < 6) {
     errEl.textContent = 'New password must be at least 6 characters.';
