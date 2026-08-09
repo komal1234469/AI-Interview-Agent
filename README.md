@@ -621,6 +621,6 @@ into a single end-to-end technical interview preparation platform.
 
 # 👥 Team
 
-## The AI Cohort — Root Access Team
+## The AI Cohort — Root Access Team 
 
 Built as an AI-powered technical interview and assessment platform.
