@@ -1,6 +1,6 @@
 # 🤖 AI Interview Agent — The AI Cohort
 
-An AI-powered technical interview platform that conducts **personalized mock interviews** based on a candidate's real progress through the 31-day AI Cohort curriculum.
+An AI-powered technical interview platform that conducts **personalized mock interviews** based on a candidate's real progress through the 31-day AI Cohort curriculum. 
 
 The system analyzes candidate progress, identifies strengths and knowledge gaps, creates a personalized interview plan, conducts a multi-turn adaptive interview, evaluates responses, and generates structured feedback.
 
