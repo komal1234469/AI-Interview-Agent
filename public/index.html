@@ -1438,27 +1438,104 @@ document.getElementById('askAiBtn').addEventListener('click', () => {
   document.getElementById('backBtn').classList.add('active');
 });
 
-document.getElementById('askAiSubmitBtn').addEventListener('click', async () => {
+const predefinedAnswers = {
+  "what is ai": "AI, or Artificial Intelligence, enables machines to perform tasks that normally require human intelligence, such as learning, reasoning, problem-solving, and decision-making.",
+  "what is artificial intelligence": "Artificial Intelligence is a field of computer science that enables machines to learn from data, recognize patterns, and make decisions.",
+  "what is machine learning": "Machine Learning is a subset of AI where computers learn patterns from data instead of being explicitly programmed for every task.",
+  "what is deep learning": "Deep Learning is a subset of Machine Learning that uses multi-layer neural networks to learn complex patterns from large amounts of data.",
+  "what is nlp": "NLP, or Natural Language Processing, is a field of AI that helps computers understand, process, and generate human language.",
+  "what is generative ai": "Generative AI is a type of AI that can create new content such as text, images, code, audio, and video based on patterns learned from data.",
+  "what is overfitting": "Overfitting happens when a machine learning model learns the training data too closely, including noise. It performs well on training data but poorly on new or unseen data.",
+  "what is underfitting": "Underfitting happens when a model is too simple to learn the important patterns in the data, so it performs poorly on both training and testing data.",
+  "supervised vs unsupervised learning": "Supervised learning uses labeled data to predict an output, such as classification or regression. Unsupervised learning uses unlabeled data to discover hidden patterns, such as clustering.",
+  "difference between supervised and unsupervised learning": "Supervised learning uses labeled data to predict an output, while unsupervised learning uses unlabeled data to discover hidden patterns or groups.",
+  "what is an api": "An API, or Application Programming Interface, allows different software applications to communicate and exchange data with each other.",
+  "what is llm": "LLM stands for Large Language Model. It is an AI model trained on large amounts of text data to understand and generate human-like language.",
+  "what is a transformer": "A Transformer is a deep learning architecture that uses attention mechanisms to understand relationships between different parts of input data. It is widely used in modern language models.",
+  "what is rag": "RAG stands for Retrieval-Augmented Generation. It improves AI responses by retrieving relevant information from a knowledge source and providing it as context to the language model.",
+  "what is vector database": "A vector database stores data as numerical vector embeddings and helps find semantically similar information efficiently.",
+  "what is prompt engineering": "Prompt engineering is the process of designing clear and effective instructions for AI models to get accurate and useful responses.",
+  "what is fine tuning": "Fine-tuning is the process of further training a pre-trained AI model on specific data so that it performs better for a particular task or domain.",
+  "what is mcp": "MCP stands for Model Context Protocol. It provides a standardized way for AI models to connect with external tools, data sources, and services.",
+  "what is sql": "SQL, or Structured Query Language, is used to store, retrieve, update, and manage data in relational databases.",
+  "what is python": "Python is a high-level programming language known for its simple syntax and wide use in AI, Machine Learning, Data Science, automation, and web development.",
+  "what is an embedding": "An embedding is a numerical representation of data, such as text, that captures its semantic meaning and allows similar items to be compared mathematically."
+};
+
+function normalizeAskAiQuestion(question) {
+  return question
+    .toLowerCase()
+    .trim()
+    .replace(/[?.!,;:]/g, '')
+    .replace(/\s+/g, ' ');
+}
+
+function getPredefinedAnswer(question) {
+  const normalizedQuestion = normalizeAskAiQuestion(question);
+
+  if (predefinedAnswers[normalizedQuestion]) {
+    return predefinedAnswers[normalizedQuestion];
+  }
+
+  for (const key in predefinedAnswers) {
+    if (normalizedQuestion.includes(key) || key.includes(normalizedQuestion)) {
+      return predefinedAnswers[key];
+    }
+  }
+
+  const keywordAnswers = [
+    ['machine learning', predefinedAnswers['what is machine learning']],
+    ['deep learning', predefinedAnswers['what is deep learning']],
+    ['generative ai', predefinedAnswers['what is generative ai']],
+    ['artificial intelligence', predefinedAnswers['what is artificial intelligence']],
+    ['overfitting', predefinedAnswers['what is overfitting']],
+    ['underfitting', predefinedAnswers['what is underfitting']],
+    ['supervised', predefinedAnswers['supervised vs unsupervised learning']],
+    ['unsupervised', predefinedAnswers['supervised vs unsupervised learning']],
+    ['transformer', predefinedAnswers['what is a transformer']],
+    ['rag', predefinedAnswers['what is rag']],
+    ['retrieval augmented generation', predefinedAnswers['what is rag']],
+    ['vector', predefinedAnswers['what is vector database']],
+    ['embedding', predefinedAnswers['what is an embedding']],
+    ['prompt', predefinedAnswers['what is prompt engineering']],
+    ['fine tuning', predefinedAnswers['what is fine tuning']],
+    ['mcp', predefinedAnswers['what is mcp']],
+    ['model context protocol', predefinedAnswers['what is mcp']],
+    ['llm', predefinedAnswers['what is llm']],
+    ['large language model', predefinedAnswers['what is llm']],
+    ['api', predefinedAnswers['what is an api']],
+    ['python', predefinedAnswers['what is python']],
+    ['sql', predefinedAnswers['what is sql']],
+    ['nlp', predefinedAnswers['what is nlp']]
+  ];
+
+  for (const [keyword, answer] of keywordAnswers) {
+    if (normalizedQuestion.includes(keyword)) return answer;
+  }
+
+  return "This Ask AI demo currently supports predefined questions about AI, Machine Learning, Deep Learning, NLP, Generative AI, LLMs, Transformers, RAG, embeddings, vector databases, prompt engineering, fine-tuning, MCP, APIs, Python, and SQL. Please try one of these topics.";
+}
+
+function submitAskAiQuestion() {
   const input = document.getElementById('askAiInput');
   const question = input.value.trim();
   if (!question) return;
+
   const answerEl = document.getElementById('askAiAnswer');
   const btn = document.getElementById('askAiSubmitBtn');
   btn.disabled = true;
   answerEl.textContent = 'Thinking...';
-  try {
-    const res = await fetch('/api/ask', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ question }),
-    });
-    const data = await res.json();
-    answerEl.textContent = data.answer || 'Sorry, something went wrong.';
+
+  setTimeout(() => {
+    answerEl.textContent = getPredefinedAnswer(question);
     input.value = '';
-  } catch (err) {
-    answerEl.textContent = 'Sorry, something went wrong. Please try again.';
-  }
-  btn.disabled = false;
+    btn.disabled = false;
+  }, 700);
+}
+
+document.getElementById('askAiSubmitBtn').addEventListener('click', submitAskAiQuestion);
+document.getElementById('askAiInput').addEventListener('keydown', (event) => {
+  if (event.key === 'Enter') submitAskAiQuestion();
 });
 
 function scoreColor(score) {
